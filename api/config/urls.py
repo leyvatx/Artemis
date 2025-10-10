@@ -16,14 +16,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/users/', include('apps.users.urls')),
-    path('api/biometrics/', include('apps.biometrics.urls')),
-    path('api/geolocation/', include('apps.geolocation.urls')),
-    path('api/alerts/', include('apps.alerts.urls')),
-    path('api/events/', include('apps.events.urls')),
-    path('api/recommendations/', include('apps.recommendations.urls')),
-    path('api/reports/', include('apps.reports.urls')),
+    
+    # API Documentation
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # Authentication
+    path('auth/', include('apps.users.auth_urls_simple')),
+    
+    # API Endpoints
+    path('roles/', include('apps.users.role_urls')),
+    path('users/', include('apps.users.urls')),
+    path('supervisors/', include('apps.users.supervisor_urls')),
+    path('metric-types/', include('apps.biometrics.type_urls')),
+    path('biometrics/', include('apps.biometrics.urls')),
+    path('geolocation/', include('apps.geolocation.urls')),
+    path('alert-types/', include('apps.alerts.type_urls')),
+    path('alerts/', include('apps.alerts.urls')),
+    path('events/', include('apps.events.urls')),
+    path('recommendations/', include('apps.recommendations.urls')),
+    path('reports/', include('apps.reports.urls')),
 ]
