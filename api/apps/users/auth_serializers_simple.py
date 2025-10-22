@@ -1,6 +1,6 @@
 from rest_framework import serializers
+from django.contrib.auth.hashers import make_password, check_password
 from .models import User, Role
-import hashlib
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -13,9 +13,8 @@ class LoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(email=email, status='Active')
             # Verificación simple de password
-            password_hash = hashlib.sha256(password.encode()).hexdigest()
             
-            if user.password_hash == password_hash:
+            if check_password(password, user.password_hash):
                 return {'user': user}
             else:
                 raise serializers.ValidationError('Credenciales inválidas')
@@ -57,9 +56,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             name=validated_data['name'],
             email=validated_data['email'],
-            password_hash=hashlib.sha256(password.encode()).hexdigest(),
+            password_hash=make_password(password),
             role=role,
             status='Active'
         )
-        
+
         return user
+
+
+class UserResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    email = serializers.EmailField()
+    role = serializers.CharField(source='role.name', allow_null=True)
+    status = serializers.CharField()

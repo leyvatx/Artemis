@@ -14,20 +14,30 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+
+def api_root(request):
+    """Minimal API root returning available top-level endpoints as JSON."""
+    return JsonResponse({
+        "message": "Artemis API",
+        "endpoints": [
+            "docs/", "schema/", "redoc/", "roles/", "users/", "biometrics/",
+            "geolocation/", "alerts/", "events/", "recommendations/", "reports/",
+        ],
+    })
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', api_root),
     
-    # API Documentation
+    # API Documentation (Swagger/OpenAPI)
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
-    # Authentication
-    path('auth/', include('apps.users.auth_urls_simple')),
+    # Authentication (removed custom login/register endpoints to keep CRUD-only API)
     
     # API Endpoints
     path('roles/', include('apps.users.role_urls')),

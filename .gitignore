@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+api/venv/
+venv/
+.venv/
+
+# Pytest cache
+.pytest_cache/
+
+# Logs
+*.log
+
+# SQLite DB
+*.sqlite3
+
+# IDE / Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Mac
+.DS_Store

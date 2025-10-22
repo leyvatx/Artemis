@@ -1,24 +1,28 @@
 from rest_framework import serializers
+from api.core.serializers import RelatedAttrField
 from .models import Role, User, SupervisorAssignment
+
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
 
+
 class SupervisorAssignmentSerializer(serializers.ModelSerializer):
-    supervisor_name = serializers.CharField(source='supervisor.name', read_only=True)
-    officer_name = serializers.CharField(source='officer.name', read_only=True)
-    
+    supervisor_name = RelatedAttrField('supervisor.name')
+    officer_name = RelatedAttrField('officer.name')
+
     class Meta:
         model = SupervisorAssignment
         fields = ['id', 'supervisor', 'officer', 'supervisor_name', 'officer_name', 'start_date', 'end_date']
-        
+
     def validate(self, data):
         if not data.get('supervisor'):
             raise serializers.ValidationError("Supervisor is required")
