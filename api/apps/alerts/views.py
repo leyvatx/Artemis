@@ -1,11 +1,13 @@
-from rest_framework import viewsets
+from api.core.views import BaseViewSet
 from .models import AlertType, Alert
 from .serializers import AlertTypeSerializer, AlertSerializer
 
-class AlertTypeViewSet(viewsets.ModelViewSet):
+
+class AlertTypeViewSet(BaseViewSet):
     queryset = AlertType.objects.all()
     serializer_class = AlertTypeSerializer
 
-class AlertViewSet(viewsets.ModelViewSet):
+
+class AlertViewSet(BaseViewSet):
     queryset = Alert.objects.all()
     serializer_class = AlertSerializer

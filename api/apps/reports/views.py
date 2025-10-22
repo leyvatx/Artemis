@@ -1,7 +1,8 @@
-from rest_framework import viewsets
+from api.core.views import BaseViewSet
 from .models import Report
 from .serializers import ReportSerializer
 
-class ReportViewSet(viewsets.ModelViewSet):
+
+class ReportViewSet(BaseViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
