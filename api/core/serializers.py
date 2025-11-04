@@ -1,15 +1,27 @@
 from rest_framework import serializers
 
 
-class RelatedAttrField(serializers.CharField):
-    """Convenience field for exposing a related object's attribute.
-
-    Usage:
-        owner_name = RelatedAttrField('owner.name')
-
-    This sets `source` and `read_only=True` automatically.
+class RelatedAttrField(serializers.RelatedField):
     """
+    A field for accessing nested attributes on related objects.
+    Usage: user_name = RelatedAttrField('user.name')
+    """
+    def __init__(self, attr_path, **kwargs):
+        self.attr_path = attr_path
+        super().__init__(**kwargs)
 
-    def __init__(self, source_attr, **kwargs):
-        kwargs.setdefault('read_only', True)
-        super().__init__(source=source_attr, **kwargs)
+    def to_representation(self, value):
+        attrs = self.attr_path.split('.')
+        for attr in attrs:
+            value = getattr(value, attr, None)
+            if value is None:
+                return None
+        return value
+
+
+class PaginatedResponseSerializer(serializers.Serializer):
+    """Standard paginated response format"""
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True)
+    previous = serializers.URLField(allow_null=True)
+    results = serializers.ListField()

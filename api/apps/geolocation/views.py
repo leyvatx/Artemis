@@ -1,4 +1,4 @@
-from api.core.views import BaseViewSet
+from core.views import BaseViewSet
 from .models import GeoLocation
 from .serializers import GeoLocationSerializer
 

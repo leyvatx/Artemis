@@ -1,4 +1,4 @@
-from api.core.views import BaseViewSet
+from core.views import BaseViewSet
 from .models import Report
 from .serializers import ReportSerializer
 

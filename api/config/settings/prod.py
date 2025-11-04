@@ -1,24 +1,27 @@
 from .base import *
 import os
+from decouple import config
 
 # Ensure production mode
 DEBUG = False
 
 # Hosts allowed to serve the application. Prefer configuring via env var
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'yourdomain.com').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='yourdomain.com').split(',')
 
 # Production secret key - MUST be provided via environment in real deployments
-SECRET_KEY = os.getenv('SECRET_KEY', 'your-production-secret-key')
+SECRET_KEY = config('SECRET_KEY')
 
-# Database for production (example MySQL settings). Replace via env in real deploys.
+# PostgreSQL Database for production
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
-        'NAME': os.getenv('DB_NAME', 'artemis'),
-        'USER': os.getenv('DB_USER', 'your_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'your_password'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '3306'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -26,3 +29,6 @@ DATABASES = {
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

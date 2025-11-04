@@ -1,5 +1,0 @@
-﻿Django==5.2.6
-djangorestframework==3.16.1
-drf-spectacular
-djangorestframework-simplejwt
-django-cors-headers
