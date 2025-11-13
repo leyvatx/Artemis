@@ -39,7 +39,6 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(choices=[('Active', 'Active'), ('Inactive', 'Inactive'), ('OnLeave', 'On Leave'), ('Suspended', 'Suspended')], db_index=True, default='Active', max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('is_active', models.BooleanField(db_index=True, default=True)),
                 ('role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='users.role')),
             ],
             options={
@@ -74,10 +73,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='user',
-            index=models.Index(fields=['is_active'], name='users_is_acti_847b48_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='user',
             index=models.Index(fields=['created_at'], name='users_created_6541e9_idx'),
         ),
         migrations.AddIndex(
@@ -88,8 +83,8 @@ class Migration(migrations.Migration):
             model_name='supervisorassignment',
             index=models.Index(fields=['officer', 'end_date'], name='supervisor__officer_eacf74_idx'),
         ),
-        migrations.AlterUniqueTogether(
-            name='supervisorassignment',
-            unique_together={('supervisor', 'officer', 'end_date')},
+        migrations.AddConstraint(
+            model_name='supervisorassignment',
+            constraint=models.UniqueConstraint(condition=models.Q(('end_date__isnull', True)), fields=('supervisor', 'officer'), name='unique_active_supervisor_officer'),
         ),
     ]

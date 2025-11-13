@@ -25,11 +25,14 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('value', models.FloatField()),
+                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bpms', to='users.user')),
             ],
             options={
                 'db_table': 'bpm',
-                'ordering': ['-id'],
+                'ordering': ['-created_at'],
+                'indexes': [models.Index(fields=['user', 'created_at'], name='bpm_user_id_1de76c_idx')],
             },
         ),
         migrations.DeleteModel(
