@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from core.serializers import RelatedAttrField
 from .models import Role, User, SupervisorAssignment
 
 
@@ -21,12 +20,11 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role_name = serializers.CharField(source='role.name', read_only=True)
-
+    # Expose only the role id; do not show password_hash, status, timestamps here
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'status', 'role', 'role_name', 'is_active', 'created_at', 'updated_at']
-        read_only_fields = ['created_at', 'updated_at']
+        fields = ['id', 'name', 'email', 'role']
+        read_only_fields = ['id']
 
     def validate_name(self, value):
         if len(value.strip()) < 2:
@@ -43,11 +41,6 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return email_lower
 
-    def validate_status(self, value):
-        valid_statuses = dict(User.STATUS_CHOICES)
-        if value not in valid_statuses:
-            raise serializers.ValidationError(f"Invalid status. Choose from: {list(valid_statuses.keys())}")
-        return value
 
 
 class UserDetailSerializer(UserSerializer):

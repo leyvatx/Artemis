@@ -4,6 +4,7 @@ This module provides helpers to create events from different app contexts.
 """
 
 from django.utils import timezone
+from apps.users.models import User as UserModel
 from .models import Event
 
 
@@ -84,8 +85,29 @@ class EventLogger:
         Returns:
             Event instance
         """
+        # Resolve user: accept a User instance, a user id (int/str), or an anonymous/None.
+        resolved_user = None
+        try:
+            # If user is a Django User instance
+            if isinstance(user, UserModel):
+                resolved_user = user
+            # AnonymousUser or falsy -> keep None
+            elif getattr(user, 'is_authenticated', False) is False:
+                resolved_user = None
+            else:
+                # If a numeric id was passed, try to fetch the user
+                if isinstance(user, (int, str)):
+                    try:
+                        resolved_user = UserModel.objects.get(pk=int(user))
+                    except Exception:
+                        resolved_user = None
+                else:
+                    resolved_user = None
+        except Exception:
+            resolved_user = None
+
         event = Event.objects.create(
-            user=user,
+            user=resolved_user,
             title=title,
             category=category,
             description=description,

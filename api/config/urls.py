@@ -37,13 +37,13 @@ urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
-    # Authentication (removed custom login/register endpoints to keep CRUD-only API)
+    # Authentication
+    path('auth/', include('apps.users.auth_urls')),
     
     # API Endpoints
     path('roles/', include('apps.users.role_urls')),
     path('users/', include('apps.users.urls')),
     path('supervisors/', include('apps.users.supervisor_urls')),
-    path('metric-types/', include('apps.biometrics.type_urls')),
     path('biometrics/', include('apps.biometrics.urls')),
     path('geolocation/', include('apps.geolocation.urls')),
     path('alert-types/', include('apps.alerts.type_urls')),

@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from core.serializers import RelatedAttrField
 from .models import Event
 
 
 class EventSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.name', read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
+    # Use SerializerMethodField so we handle events without a linked user
+    user_name = serializers.SerializerMethodField(read_only=True)
+    user_email = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Event
@@ -15,6 +15,12 @@ class EventSerializer(serializers.ModelSerializer):
             'created_at'
         ]
         read_only_fields = ['created_at']
+
+    def get_user_name(self, obj):
+        return obj.user.name if getattr(obj, 'user', None) else None
+
+    def get_user_email(self, obj):
+        return obj.user.email if getattr(obj, 'user', None) else None
 
     def validate_title(self, value):
         if len(value.strip()) < 3:

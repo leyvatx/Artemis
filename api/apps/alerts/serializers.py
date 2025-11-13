@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from core.serializers import RelatedAttrField
 from .models import AlertType, Alert, ALERT_LEVEL_CHOICES, ALERT_STATUS_CHOICES
 
 

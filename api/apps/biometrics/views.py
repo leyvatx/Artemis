@@ -1,44 +1,50 @@
 from core.views import BaseViewSet
-from .models import MetricType, BiometricRecord
-from .serializers import MetricTypeSerializer, BiometricRecordSerializer
-from apps.events import EventLogger  # ← NUEVO: Para registrar eventos
+from .models import BPM
+from .serializers import BPMSerializer
+from apps.events import EventLogger
 
 
-class MetricTypeViewSet(BaseViewSet):
-    queryset = MetricType.objects.all()
-    serializer_class = MetricTypeSerializer
+class BPMViewSet(BaseViewSet):
+    """ViewSet for simple BPM sensor readings."""
+    queryset = BPM.objects.all()
+    serializer_class = BPMSerializer
 
-
-class BiometricRecordViewSet(BaseViewSet):
-    queryset = BiometricRecord.objects.all()
-    serializer_class = BiometricRecordSerializer
-    
     def create(self, request, *args, **kwargs):
-        """Crear un registro biométrico y registrar evento"""
+        # Call superclass to validate and create the BPM instance. The serializer
+        # expects `user_id` in the payload.
         response = super().create(request, *args, **kwargs)
-        
-        # ← NUEVO: Registrar evento de éxito
+
+        # Determine user for logging: prefer explicit user_id from payload,
+        # otherwise fall back to authenticated request.user (EventLogger handles id/instance/anonymous).
+        user_id = None
+        try:
+            # Try to read from request data first
+            if isinstance(request.data, dict):
+                user_id = request.data.get('user_id')
+        except Exception:
+            user_id = None
+
+        log_user = user_id if user_id is not None else request.user
+
         EventLogger.log_event(
-            user=request.user,
-            title="Biometric Record Created",
+            user=log_user,
+            title="BPM Record Created",
             category="Biometric_Capture_Success",
-            description=f"Nuevo registro biométrico creado",
+            description="BPM reading created",
             ip_address=request.META.get('REMOTE_ADDR')
         )
-        
+
         return response
-    
+
     def destroy(self, request, *args, **kwargs):
-        """Eliminar un registro biométrico y registrar evento"""
         response = super().destroy(request, *args, **kwargs)
-        
-        # ← NUEVO: Registrar evento de eliminación
+
         EventLogger.log_event(
             user=request.user,
-            title="Biometric Data Deleted",
+            title="BPM Record Deleted",
             category="Biometric_Data_Deleted",
-            description="Registro biométrico eliminado",
+            description="BPM reading deleted",
             ip_address=request.META.get('REMOTE_ADDR')
         )
-        
+
         return response

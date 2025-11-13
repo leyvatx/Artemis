@@ -62,13 +62,15 @@ class Event(models.Model):
     ]
     
     event_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='events')
+    # Allow events without a linked user (e.g. anonymous, system) and keep events
+    # if a user is deleted by using SET_NULL.
+    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='events')
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     category = models.CharField(max_length=50, choices=EVENT_CATEGORIES, default='Other', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.CharField(max_length=255, blank=True)
+    user_agent = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         app_label = 'events'
@@ -80,4 +82,5 @@ class Event(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.title} - {self.user.name}"
+        user_part = self.user.name if self.user else 'Anonymous'
+        return f"{self.title} - {user_part}"
