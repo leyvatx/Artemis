@@ -1,0 +1,119 @@
+
+<!-- ----------------------------------------------------------------------- -->
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang='es'>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<head>
+    <meta charset='UTF-8' />
+    <meta name='theme-color' content='#F6F8F8' media='(prefers-color-scheme: light)' />
+    <meta name='theme-color' content='#161D1D' media='(prefers-color-scheme: dark)' />
+
+    <meta name='author' content='Artemis ― (Ed Rubio)' />
+    <meta name='description' content='Panel de administración' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+
+    <title>{% block title %}{% endblock title %} | Artemis</title>
+    <link rel='shortcut icon' type='image/png' href='{% static "images/favicon.png" %}'>
+
+    <link href='{% static "css/main.css" %}' rel='stylesheet' />
+    <link href='{% static "css/dashboard/base.css" %}' rel='stylesheet' />
+    {% block stylesheet %}{% endblock stylesheet %} <!-- Estilos únicos de una determinada plantilla. -->
+
+    <script src='{% static "scripts/main.js" %}' defer></script>
+    {% block scripts %}{% endblock scripts %} <!-- Scripts únicos de una determinada plantilla. -->
+
+    <!-- Google Icons CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<body> <!-- Estructura base mostrada en todas las secciones del panel de administración. -->
+
+<aside class='main-sidebar-container'>
+    <div class='main-sidebar'>
+
+        <!-- Header del SIDEBAR -->
+        <div class='main-sidebar-header'>
+            <img src='{% static "images/mainicon.webp" %}' alt='Artemis (logotipo)'>
+            <h1>Artemis™</h1>
+        </div>
+
+        <!-- Enlaces de navegación del SIDEBAR -->
+        <nav class='main-sidebar-content'>
+            <a href='{% url "dashboard:Home" %}' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                home</span><p>Inicio</p></a>
+
+            <a href='{% url "dashboard:OfficersList" %}' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                local_police</span><p>Oficiales</p></a>
+
+            <a href='#' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                location_searching</span><p>Geolocalización</p></a>
+
+            <a href='#' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                planner_review</span><p>Análisis</p></a>
+
+            <a href='#' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                library_books</span><p>Reportes</p></a>
+
+            <a href='#' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                search_activity</span><p>Eventos</p></a>
+        </nav>
+
+        <!-- Footer del SIDEBAR -->
+        <div class='main-sidebar-footer'>
+            <a id='theme-toggle' class='main-sidebar-button'>
+                <span class='material-symbols-outlined'>
+                contrast</span><p>Cambiar tema</p></a>
+
+            <a href='#' class='main-sidebar-button logout-button'>
+                <span class='material-symbols-outlined'>
+                logout</span><p>Cerrar sesión</p></a>
+        </div>
+
+    </div>
+</aside>
+
+<main class='main-content'>
+    <header class='main-header'>
+
+        <!-- Botón de activación del SIDEBAR -->
+        <div class='main-header-toggle'>
+            <span class='material-symbols-outlined' id='toggle-main-sidebar'>menu_open</span>
+        </div>
+
+        <!-- Información básica -->
+        <div class='main-header-user-area'>
+            <span class='material-symbols-outlined main-header-notifications-icon'>notifications</span>
+            <a class='main-header-user-info' href='#'>
+                <span class='user-initial-circle'>E</span>
+            </a>
+        </div>
+
+    </header>
+
+    <!-- Contenido a mostrar en cada plantilla. -->
+    <section class='main-container'>
+        {% block content %}{% endblock content %}
+    </section>
+
+    <footer class='main-footer'>
+        <p>© 2025 Artemis. Todos los derechos reservados.</p>
+    </footer>
+</main>
+
+</body>
+</html>
+
+<!-- ----------------------------------------------------------------------- -->

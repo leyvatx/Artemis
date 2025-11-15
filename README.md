@@ -11,6 +11,13 @@ SISTEMA INTELIGENTE DE MONITOREO Y ASISTENCIA PARA EL BIENESTAR INTEGRAL DEL CUE
 
 </div>
 
+<h1 align='center'>
+    <a href='https://github.com/lord-of-castamere/Irithyll'>
+        <img src='./statics/images/Siegward.webp' width='25%'
+            alt='¿Quién soy yo para juzgar caminos ajenos? Si yo mismo camino como un hombre imperfecto' />
+    </a>
+</h1>
+
 <!-- ----------------------------------------------------------------------- -->
 
 <br>

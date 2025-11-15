@@ -1,0 +1,261 @@
+
+/* -- CSS ------------------------------------------------------------------- */
+
+.main-sidebar-container {
+    z-index: 200;
+}
+
+.main-header {
+    z-index: 180;
+}
+
+.main-sidebar-container.is-open {
+    width: var(--sidebar-width-open);
+}
+
+.main-sidebar-container.is-open .main-sidebar {
+    width: var(--sidebar-width-open);
+}
+
+.main-sidebar-container.is-open .main-sidebar-header h1 {
+    display: block;
+}
+
+.main-sidebar-container.is-open .main-sidebar-button {
+    justify-content: flex-start;
+}
+
+.main-sidebar-container.is-open .main-sidebar-button:hover {
+    background-color: var(--info-background);
+}
+
+.main-sidebar-container.is-open .logout-button:hover {
+    background-color: var(--error-background);
+}
+
+.main-sidebar-container.is-open .main-sidebar-button p {
+    display: block;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-sidebar-container {
+    width: var(--sidebar-width-closed);
+    background-color: var(--background-color);
+    border-right: .125rem solid var(--canvas-color);
+}
+
+.main-sidebar {
+    top: 0; left: 0; height: 100vh;
+    display: grid; position: sticky;
+    grid-template-rows: 8rem 1fr auto;
+    width: var(--sidebar-width-closed);
+    grid-template-columns: repeat(1, 1fr);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-sidebar-header {
+    justify-content: center;
+    grid-row: 1; height: 8rem;
+    padding: 2rem; align-items: center;
+    display: flex; flex-direction: row;
+}
+
+.main-sidebar-header img {
+    width: 4rem;
+    object-fit: contain;
+    filter: drop-shadow(
+        0 0 .25rem var(--text-color));
+}
+
+.main-sidebar-header h1 {
+    display: none;
+    margin-left: 1.5rem;
+    color: var(--state-active);
+    filter: drop-shadow(
+        0 0 .25rem rgba(28, 28, 30, .2));
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-sidebar-content {
+    display: flex; flex-direction: column;
+    grid-row: 2; justify-content: flex-start;
+}
+
+.main-sidebar-button {
+    padding: 1.5rem 2rem;
+    width: 100%; gap: .5rem;
+
+    align-items: center;
+    border-right: .3rem solid transparent;
+    display: flex; justify-content: center;
+}
+
+.main-sidebar-button p {
+    display: none;
+}
+
+.main-sidebar-button span, .main-sidebar-button p {
+    color: var(--state-idle);
+}
+
+.main-sidebar-button:hover {
+    border-right-color: var(--state-hover);
+}
+
+.main-sidebar-button:hover span, .main-sidebar-button:hover p {
+    color: var(--state-hover);
+}
+
+.main-sidebar-button:active {
+    border-right-color: var(--state-active);
+}
+
+.main-sidebar-button:active span, .main-sidebar-button:active p {
+    color: var(--state-active);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-sidebar-footer {
+    grid-row: 3;
+    padding-bottom: 2rem;
+}
+
+.logout-button span, .logout-button p {
+    opacity: .6;
+    color: var(--error-text);
+}
+
+.logout-button:hover {
+    border-right-color: var(--error-text);
+}
+
+.logout-button:hover span, .logout-button:hover p {
+    opacity: 1;
+    color: var(--error-text);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-header {
+    position: sticky;
+    align-items: center;
+    top: 0; left: 0; height: 8rem;
+    display: flex; flex-direction: row;
+    background-color: var(--background-color);
+    box-shadow: 0 .5rem 3rem 1.5rem var(--background-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-header-toggle span {
+    padding: 1.4rem;
+    font-size: 2.2rem;
+    color: var(--state-idle);
+}
+
+.main-header-toggle span:hover {
+    color: var(--state-hover);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-header-search {
+    opacity: .75;
+    position: relative;
+    flex: auto; display: flex;
+    align-items: center; justify-content: center;
+}
+
+.main-header-search input[type='text'] {
+    width: 100%;
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    padding: 1.25rem 2rem;
+    border-radius: .4rem;
+    border: none; outline: none;
+    background-color: var(--canvas-color);
+}
+
+.main-header-search:hover, 
+.main-header-search input[type='text']:hover {
+    opacity: .8;
+}
+
+.main-header-search:hover, 
+.main-header-search input[type='text']:active {
+    opacity: 1;
+}
+
+.main-header-search input[type='text']::placeholder {
+    font-size: 1.2rem;
+}
+
+#voice-search-btn {
+    cursor: pointer;
+    position: absolute;
+    top: 50%; right: 2rem;
+    transform: translateY(-50%);
+    padding: .5rem; border-radius: 50%;
+    color: var(--state-hover);
+}
+
+#voice-search-btn:hover {
+    color: var(--state-active);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-header-user-area {
+    margin-right: 2rem;
+    flex: content; display: flex; gap: 1rem;
+    align-items: center; justify-content: right;
+}
+
+.main-header-notifications-icon {
+    padding: 1rem;
+    cursor: pointer;
+    color: var(--state-idle);
+}
+
+.user-initial-circle {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 3rem; height: 3rem;
+
+    border-radius: 50%;
+    color: var(--background-color);
+    font-size: 1.2rem; font-weight: bold;
+    background-color: var(--state-hover);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-container, .main-header, .main-footer {
+    padding: 1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-container {
+    flex-grow: 1;
+    view-transition-name: main-content-transition;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.main-footer {
+    text-align: center;
+    background-color: var(--canvas-color);
+}
+
+/* -------------------------------------------------------------------------- */

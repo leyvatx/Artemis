@@ -1,0 +1,68 @@
+
+<!-- ----------------------------------------------------------------------- -->
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang='es'>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<head>
+    <meta charset='UTF-8' />
+    <meta name='theme-color' content='#F6F8F8' media='(prefers-color-scheme: light)' />
+    <meta name='theme-color' content='#161D1D' media='(prefers-color-scheme: dark)' />
+
+    <meta name='author' content='Artemis ― (Ed Rubio)' />
+    <meta name='description' content='Inicio de sesión: Artemis' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+
+    <title>Iniciar sesión | Artemis</title>
+    <link rel='shortcut icon' type='image/png' href='{% static "images/favicon.png" %}'>
+
+    <link href='{% static "css/main.css" %}' rel='stylesheet' />
+    <link href='{% static "css/session.css" %}' rel='stylesheet' />
+
+    <script src='{% static "scripts/main.js" %}' defer></script>
+
+    <!-- Google Icons CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<body> <!-- Estructura utilizada únicamente en la sección de inicio de sesión. -->
+    <main class='main-content'>
+
+    <div class='login-section'>
+        <img src={% static 'images/favicon.png' %} draggable='false' loading='lazy' alt='Artemis (logotipo)' />
+
+        <form method='post' class='login-form'>{% csrf_token %}
+            <div class='form-group icon-input'>
+                <span class='material-symbols-outlined'>person</span>
+                <input type='text' id='id_username' name='username' placeholder='Nombre de usuario' required>
+            </div>
+
+            <div class='form-group icon-input'>
+                <span class='material-symbols-outlined'>key</span>
+                <input type='password' id='id_password' name='password' placeholder='Contraseña' required>
+            </div>
+
+            <button type='submit' class='login-button'>Continuar</button>
+
+            {% if messages %}
+            <ul class='messages'>
+                {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </form>
+    </div>
+
+    </main>
+</body>
+
+</html>
+
+<!-- ----------------------------------------------------------------------- -->

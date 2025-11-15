@@ -1,0 +1,123 @@
+
+/* -- CSS ------------------------------------------------------------------- */
+
+body {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(
+        rgba(28, 28, 30, .8), rgba(28, 28, 30, .8)),
+        url('../images/signin.jpg');
+}
+
+.main-content {
+    align-items: center; justify-content: center;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.login-section {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+
+    border-radius: .4rem; width: 24rem;
+    background-color: var(--background-color);
+    box-shadow: 0 .5rem 5rem var(--background-color);
+}
+
+.login-section img {
+    margin: 2.5rem 0;
+    width: 10rem; object-fit: contain;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.login-form {
+    padding: 2rem 4rem; width: 100%;
+}
+
+.form-group.icon-input {
+    position: relative;
+    margin-bottom: 1.2rem;
+}
+
+.form-group.icon-input span {
+    position: absolute;
+    color: var(--state-hover);
+    font-size: .8rem; left: .8rem;
+    transform: translateY(-50%); top: 50%;
+}
+
+.form-group.icon-input input {
+    font-size: .92rem;
+    color: var(--text-secondary);
+    width: 100%; padding: .85rem .75rem .85rem 3rem;
+    border-bottom: .125rem solid var(--state-active);
+}
+
+.form-group.icon-input input::placeholder {
+    color: var(--text-secondary);
+}
+
+.form-group.icon-input input:hover {
+    border-bottom-color: var(--state-hover);
+}
+
+.form-group.icon-input input:focus {
+    border-bottom-color: var(--state-active);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.new-account {
+    padding-inline: .5rem;
+    text-decoration: underline;
+    text-underline-offset: .25rem;
+}
+
+.login-button {
+    font-size: .95rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--state-hover);
+    background-color: var(--canvas-color);
+
+    margin-top: 2.5rem;
+    border-radius: .4rem;
+    width: 100%; padding: .75rem;
+}
+
+.login-button:hover {
+    color: var(--background-color);
+    background-color: var(--state-hover);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.messages {
+    list-style: none;
+    font-size: 1.15rem;
+    padding: 0; margin-top: 1.5rem;
+    font-weight: bold; text-align: center;
+}
+
+.messages li {
+    padding: .75rem;
+    border-radius: .5rem;
+}
+
+.messages .error {
+    color: var(--text-secondary);
+    background-color: var(--color-danger);
+}
+
+.messages .success {
+    color: var(--success-text);
+    background-color: var(--success-background);
+}
+
+.messages .info {
+    color: var(--info-text);
+    background-color: var(--info-background);
+}
+
+/* -------------------------------------------------------------------------- */

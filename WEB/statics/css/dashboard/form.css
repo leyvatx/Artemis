@@ -1,0 +1,183 @@
+
+/* -- CSS ------------------------------------------------------------------- */
+
+.dashboard-container {
+    padding-inline: 2rem;
+}
+
+.crud-header {
+    align-items: center;
+    width: 100%;
+    padding: 2rem 0;
+    justify-content: space-between;
+    display: flex;
+}
+
+.crud-header-info h2 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+}
+
+.crud-header-info span {
+    padding-top: .5rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.crud-header-back {
+    padding: .8rem 1.6rem;
+    align-items: center;
+    display: flex;
+    border: .0125rem solid var(--info-border);
+}
+
+.crud-header-back span {
+    margin-right: .5rem;
+    color: var(--info-border);
+}
+
+.crud-header-back strong {
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.crud-header-back:hover {
+    background-color: var(--info-text);
+}
+
+.crud-header-back:hover span,
+.crud-header-back:hover strong {
+    color: var(--canvas-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.crud-form {
+    margin-top: 1rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-control {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-control label {
+    margin-bottom: .5rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.form-control input,
+.form-control select {
+    padding: 1rem;
+    border-radius: .4rem;
+    background-color: var(--canvas-color);
+    color: var(--text-primary);
+    border: .0125rem solid var(--border-color);
+    outline: none;
+}
+
+.form-control input:focus,
+.form-control select:focus {
+    border-color: var(--info-border);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-save {
+    padding: .9rem 2.5rem;
+    display: flex;
+    align-items: center;
+    background-color: var(--success-background);
+    border: .0125rem solid var(--success-border);
+    cursor: pointer;
+}
+
+.action-save span {
+    margin-right: .5rem;
+    color: var(--success-border);
+}
+
+.action-save:hover {
+    background-color: var(--success-text);
+}
+
+.action-save:hover span,
+.action-save:hover {
+    color: var(--canvas-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.delete-warning {
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    background: var(--warning-background);
+    border-radius: .4rem;
+    margin-bottom: 2rem;
+}
+
+.delete-warning span {
+    margin-right: 1rem;
+    color: var(--warning-text);
+}
+
+.delete-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.action-delete {
+    padding: .9rem 2.5rem;
+    display: flex;
+    align-items: center;
+    background-color: var(--error-background);
+    border: .0125rem solid var(--warning-border);
+    cursor: pointer;
+}
+
+.action-delete span {
+    margin-right: .5rem;
+    color: var(--warning-border);
+}
+
+.action-delete:hover {
+    background-color: var(--warning-text);
+}
+
+.action-cancel {
+    padding: .9rem 2.5rem;
+    display: flex;
+    align-items: center;
+    background-color: var(--canvas-color);
+    border: .0125rem solid var(--border-color);
+}
+
+.action-cancel:hover {
+    background-color: var(--border-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 600px) {
+    .form-actions, .delete-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* -------------------------------------------------------------------------- */

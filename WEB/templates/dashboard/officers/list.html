@@ -1,0 +1,121 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+    <link href='{% static "css/dashboard/list.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}Oficiales{% endblock title %}
+
+
+{% block content%}
+<div class='dashboard-container'>
+
+    <header class='crud-header'>
+
+        <div class='crud-header-info'>
+            <h2>Gestión de oficiales</h2>
+            <span>Usted cuenta con {{ paginator.count }} oficiales a su cargo.</span>
+        </div>
+
+        <a href='{% url "dashboard:OfficersCreate" %}' class='crud-header-create'>
+            <span class='material-symbols-outlined'>add</span>
+            <strong>Añadir nuevo oficial</strong>
+        </a>
+    </header>
+
+    <section class='crud-list'>
+
+        <div class='list-filters'>
+            <div class='list-filter'>
+
+                <form method='GET'>
+                    <input type='text' name='s' id='search-bar' value='{{ search }}'
+                        placeholder='Buscar por nombre, placa, etc.' maxlength='16' />
+                </form>
+
+                <div class='list-filter-icon'>
+                    <span class='material-symbols-outlined'>filter_list</span>
+                </div>
+            </div>
+        </div>
+
+        <div class='list-container'>
+            <ul class='list-responsive'>
+
+                <li class='list-head'><ul>
+                    <li>Nombre</li>
+                    <li>Rango</li>
+                    <li>Estado</li>
+                    <li>Acciones</li>
+                </ul></li>
+
+                {% for officer in officers %}
+                <li class='list-body'><ul>
+                    <li>
+                        {% if officer.image %}
+                            <img src='{{ officer.image }}' alt='{{ officer.name }}' />
+                        {% else %}
+                            <img src='{% static "images/unknown.jpeg" %}' alt='{{ officer.name }}' />
+                        {% endif %}
+
+                        <span class='grid-title'>
+                            {{ officer.name }}
+                        </span>
+                    </li>
+
+                    <li>
+                        <span class='grid-range'>
+                            {{ officer.range }}
+                        </span>
+                    </li>
+
+                    <li class='grid-status'>
+                        {% if officer.status == "Activo" or officer.status == "En servicio" %}
+                            <span class='grid-active'>{{ officer.status }}</span>
+                        {% else %}
+                            <span class='grid-inactive'>{{ officer.status }}</span>
+                        {% endif %}
+                    </li>
+
+                    <li class='grid-actions'>
+                        <a href='{% url "dashboard:OfficersUpdate" officer.id %}' class='grid-update'>
+                            <span class='material-symbols-outlined'>edit</span>
+                            <strong>Editar</strong></a>
+                        <a href='{% url "dashboard:OfficersDelete" officer.id %}' class='grid-delete'>
+                            <span class='material-symbols-outlined'>delete</span>
+                            <strong>Eliminar</strong></a>
+                    </li>
+                </ul></li>
+
+                {% empty %}
+                    <li class='grid-body'>Sin datos a mostrar...</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Paginación -->
+        <nav class='pagination'>
+            {% if is_paginated %}
+                <strong class='current-page'>
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </strong>
+
+                <div class='step-links'>
+                    {% if page_obj.has_previous %}
+                        <a href='?page={{ page_obj.previous_page_number }}&s={{ search }}'
+                            class='step-previous-link'>Anterior</a>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href='?page={{ page_obj.next_page_number }}&s={{ search }}'
+                            class='step-next-link'>Siguiente</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </nav>
+    </section>
+
+</div>
+
+
+{% endblock content %}

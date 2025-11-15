@@ -1,0 +1,182 @@
+
+/* -- CSS ------------------------------------------------------------------- */
+
+@font-face {
+    font-family: 'GemunuLibre';
+    src: url('../fonts/GemunuLibre/GemunuLibre.ttf') format('truetype-variations');
+    font-weight: 100 900; font-display: swap;
+}
+
+@view-transition {
+    navigation: auto;
+}
+
+/* -------------------------------------------------------------------------- */
+
+:root {
+    /* Colores usados en la UI */
+    --border-color: #D7E0DF;
+    --canvas-color: #FFFAFA;
+    --background-color: #F6F8F8;
+
+    --text-primary: #242D2D;
+    --text-secondary: #445D5D; 
+    --text-disabled: #97B1AF;
+
+
+    /* Colores usados en los botones */
+    --state-idle: #AEC3B0;
+    --state-hover: #598392;
+    --state-active: #124559;
+    --state-inactive: #C5CACB;
+
+
+    /* Colores usados en alertas */
+    --success-text: #61885F;
+    --success-border: #84A682;
+    --success-background: rgba(160, 189, 158, .4);
+
+    --warning-text: #EDA632;
+    --warning-border: #F1BE58;
+    --warning-background: rgba(245, 213, 138, .4);
+
+    --error-text: #B94949;
+    --error-border: #CF6868;
+    --error-background: rgba(235, 179, 179, .4);
+
+    --info-text: #5A78B6;
+    --info-border: #81A4CD;
+    --info-background: rgba(208, 221, 237, .4);
+
+
+    /* Colores usados en el Dashboard */
+    --chart-color-01: #5E8FF7;
+    --chart-color-02: #6DD4B0;
+    --chart-color-03: #FAC464;
+    --chart-color-04: #F07C62;
+    --chart-color-05: #8575F0;
+
+
+    /* Tamaños usados en la UI */
+    --sidebar-width-closed: 8rem;
+    --sidebar-width-open: 20rem;
+}
+
+html[data-theme='dark'] {
+    /* Colores usados en la UI */
+    --border-color: #303F3F;
+    --canvas-color: #242D2D;
+    --background-color: #161D1D;
+
+    --text-primary: #DFE8E7;
+    --text-secondary: #BFD0CE; 
+    --text-disabled: #445D5D;
+
+    /* Colores usados en alertas */
+    --success-text: #A0BD9E;
+    --success-border: #84A682;
+    --success-background: rgba(97, 136, 95, .2);
+
+    --warning-text: #F5D58A;
+    --warning-border: #F1BE58;
+    --warning-background: rgba(237, 166, 50, .2);
+
+    --error-text: #DE8B8B;
+    --error-border: #CF6868;
+    --error-background: rgba(185, 73, 73, .2);
+
+    --info-text: #D0DDED;
+    --info-border: #81A4CD;
+    --info-background: rgba(90, 120, 182, .2);
+}
+
+/* -------------------------------------------------------------------------- */
+
+* {
+    user-select: none;
+    box-sizing: border-box;
+    transition: all .24s ease-in-out;
+    interpolate-size: allow-keywords;
+
+    color: var(--text-primary);
+    font-family: 'GemunuLibre', sans-serif;
+}
+
+html, body {
+    display: flex;
+    min-width: 100dvw;
+    min-height: 100dvh;
+    margin: 0; padding: 0;
+
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+    background-color: var(--background-color);
+}
+
+textarea {
+    field-sizing: content;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+img {
+    pointer-events: none;
+}
+
+button {
+    cursor: pointer;
+    border: none; outline: none;
+    box-shadow: none; background: none;
+}
+
+button:hover {
+    color: var(--state-idle);
+    background-color: var(--state-hover);
+}
+
+button:active {
+    cursor: not-allowed;
+    color: var(--state-hover);
+    background-color: var(--state-active);
+}
+
+button:disabled {
+    cursor: not-allowed;
+    color: var(--text-disabled);
+    background-color: var(--state-inactive);
+}
+
+input {
+    border: none; outline: none;
+    box-shadow: none; background: none;
+}
+
+input:-webkit-autofill, input:-webkit-autofill:hover,
+input:-webkit-autofill:focus, textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover, textarea:-webkit-autofill:focus,
+select:-webkit-autofill, select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-secondary);
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.justifiEd-text {
+    hyphens: auto;
+    text-wrap: pretty;
+    text-align: justify;
+    hyphenate-limit-chars: 7;
+}
+
+.main-content {
+    flex-grow: 1; min-height: auto;
+    display: flex; flex-direction: column;
+}
+
+/* -------------------------------------------------------------------------- */

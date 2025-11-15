@@ -1,0 +1,52 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+    <link href='{% static "css/dashboard/form.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}{{ titleSection }}{% endblock title %}
+
+
+{% block content%}
+<div class='dashboard-container'>
+
+    <header class="crud-header">
+        <div class="crud-header-info">
+            <h2>Eliminar oficial</h2>
+            <span>Está por eliminar al oficial <strong>{{ officer.name }}</strong>.</span>
+        </div>
+
+        <a href="{% url 'dashboard:OfficersList' %}" class="crud-header-back">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <strong>Volver</strong>
+        </a>
+    </header>
+
+    <section class="crud-form">
+
+        <div class="delete-warning">
+            <span class="material-symbols-outlined">warning</span>
+            <p>¿Está completamente seguro de eliminar este registro? Esta acción no puede deshacerse.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="delete-actions">
+
+                <button type="submit" class="action-delete">
+                    <span class="material-symbols-outlined">delete</span>
+                    Eliminar definitivamente
+                </button>
+
+                <a href="{% url 'dashboard:OfficersList' %}" class="action-cancel">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+
+    </section>
+
+</div>
+
+
+{% endblock content %}
