@@ -9,11 +9,14 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['name', 'email', 'password', 'password_confirm', 'role']
+        fields = ['name', 'email', 'password', 'password_confirm', 'badge_number', 'rank', 'picture', 'role']
         extra_kwargs = {
             'name': {'required': True, 'allow_blank': False},
             'email': {'required': True, 'allow_blank': False},
             'role': {'required': False},
+            'badge_number': {'required': False, 'allow_blank': True},
+            'rank': {'required': False, 'allow_blank': True},
+            'picture': {'required': False, 'allow_null': True},
         }
     
     def validate(self, data):
@@ -30,6 +33,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         if len(value.strip()) < 2:
             raise serializers.ValidationError("Name must be at least 2 characters long.")
         return value.strip()
+    
+    def validate_badge_number(self, value):
+        if value:
+            if User.objects.filter(badge_number=value).exists():
+                raise serializers.ValidationError("A user with this badge number already exists.")
+        return value
     
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -70,7 +79,7 @@ class UserAuthSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'role', 'status', 'tokens', 'created_at']
+        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'role', 'status', 'tokens', 'created_at']
         read_only_fields = ['created_at']
     
     def get_tokens(self, obj):

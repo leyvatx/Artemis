@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     # Expose only the role id; do not show password_hash, status, timestamps here
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'role']
+        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'role']
         read_only_fields = ['id']
 
     def validate_name(self, value):
@@ -41,6 +41,16 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return email_lower
 
+    def validate_badge_number(self, value):
+        if value:
+            # Check for duplicates excluding the current instance
+            qs = User.objects.filter(badge_number=value)
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise serializers.ValidationError("A user with this badge number already exists.")
+        return value
+
 
 
 class UserDetailSerializer(UserSerializer):
@@ -50,13 +60,30 @@ class UserDetailSerializer(UserSerializer):
     officers_count = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ['role_details', 'supervisor_count', 'officers_count']
+        fields = UserSerializer.Meta.fields + ['role_details', 'supervisor_count', 'officers_count', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_supervisor_count(self, obj):
         return obj.supervisor_assignments.filter(end_date__isnull=True).count()
 
     def get_officers_count(self, obj):
         return obj.officer_assignments.filter(end_date__isnull=True).count()
+
+
+class OfficerSerializer(serializers.ModelSerializer):
+    """Clean serializer for officers under a supervisor"""
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    """Clean serializer for supervisors"""
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 
 class SupervisorAssignmentSerializer(serializers.ModelSerializer):
