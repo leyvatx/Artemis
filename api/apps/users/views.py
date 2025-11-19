@@ -5,7 +5,8 @@ from core.views import BaseViewSet
 from .models import Role, User, SupervisorAssignment
 from .serializers import (
     RoleSerializer, UserSerializer, SupervisorAssignmentSerializer, 
-    UserDetailSerializer, OfficerSerializer, SupervisorSerializer
+    UserDetailSerializer, OfficerSerializer, SupervisorSerializer,
+    CleanSupervisorAssignmentSerializer
 )
 
 
@@ -56,6 +57,22 @@ class UserViewSet(BaseViewSet):
 class SupervisorAssignmentViewSet(BaseViewSet):
     queryset = SupervisorAssignment.objects.all()
     serializer_class = SupervisorAssignmentSerializer
+    
+    def get_serializer_class(self):
+        """Usar serializer limpio para list y retrieve"""
+        if self.action in ['list', 'retrieve']:
+            return CleanSupervisorAssignmentSerializer
+        return SupervisorAssignmentSerializer
+    
+    def list(self, request, *args, **kwargs):
+        """Override list para usar serializer limpio y formato personalizado"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'success': True,
+            'count': queryset.count(),
+            'assignments': serializer.data
+        }, status=status.HTTP_200_OK)
 
 
 class SupervisorViewSet(viewsets.ViewSet):

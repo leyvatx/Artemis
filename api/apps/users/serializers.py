@@ -121,3 +121,16 @@ class SupervisorAssignmentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"officer": "Officer must have Active status."})
 
         return data
+
+
+class CleanSupervisorAssignmentSerializer(serializers.ModelSerializer):
+    """Clean serializer for supervisor assignments with nested objects"""
+    supervisor = SupervisorSerializer(read_only=True)
+    officer = OfficerSerializer(read_only=True)
+
+    class Meta:
+        model = SupervisorAssignment
+        fields = [
+            'id', 'supervisor', 'officer', 'start_date', 'end_date', 'notes'
+        ]
+        read_only_fields = ['id']
