@@ -1,0 +1,196 @@
+
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+    <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' />
+    <link rel='stylesheet' href='{% static "css/dashboard/map.css" %}' />
+{% endblock stylesheet %}
+
+{% block scripts %}
+    <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
+{% endblock scripts %}
+
+{% block title %}Geolocalización{% endblock title %}
+
+{% block content%}
+<div class='dashboard-container'>
+
+    <header class='section-header'>
+        <div class='section-header-info'>
+            <h2>Geolocalización</h2>
+            <span>Consulte la ubicación en tiempo real de los oficiales en servico.</span>
+        </div>
+    </header>
+
+    <section class='map-section'>
+        <div class='map-container' id='map'></div>
+        <div class='map-card' id='map-card'></div>
+    </section>
+            
+    <script>
+        // Datos iniciales del mapa (coordenadas, nivel de zoom):
+        const map = L.map('map').setView([32.50063973895581, -116.87675336028973], 14);
+        const mapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors', maxZoom: 20 })
+
+        mapLayer.addTo(map);
+
+        // Elementos del DOM:
+        const mapCard = document.getElementById('map-card');
+        const mapContainer = document.getElementById('map');
+
+        // Marcadores:
+        var markers = {};
+        let activeMarker = null;
+
+        // INFO: Actualiza el contenido de MAP-CARD con la información del oficial seleccionado.
+        function updateMapCard(officer) {
+            mapCard.innerHTML = `
+                <div class='card-info'>
+                    <h4 class='officer-name'>${officer.name}</h4>
+                    <span class='officer-badge'>${officer.plate_number}</span>
+                </div>
+
+                <div class='card-status'>
+                    <p><strong>Rango:</strong>${officer.range}</p>
+                    <p><strong>Estado: </strong>
+                        <span class='status-indicator status-${officer.status.toLowerCase()}'>${officer.status}</span></p>
+                </div>
+
+                <div class='card-location'>
+                    <p><strong>Ubicación:</strong> ${officer && officer.lat && officer.lng 
+                        ? `${officer.lat.toFixed(4)}, ${officer.lng.toFixed(4)}` 
+                        : 'Buscando...'}</p>
+                </div>
+
+                <a href="/officer/${officer.id}/" class='card-button'>Consultar oficial</a>
+            `;
+
+            mapContainer.classList.add('active');
+            mapCard.classList.add('active');
+        }
+
+        // INFO: Actualiza el marcador del oficial al hacer clic sobre este.
+        function onMarkerClick(officialData, marker) {
+            // Desactiva el marcador anteriormente seleccionado.
+            if (activeMarker && activeMarker !== marker) {
+                const oldMarker = activeMarker._icon.querySelector('.officer-marker-container');
+                if (oldMarker) oldMarker.classList.remove('active');
+            }
+
+            // De seleccionar el mismo oficial, oculta la información.
+            if (activeMarker === marker) {
+                const currentMarker = marker._icon.querySelector('.officer-marker-container');
+                if (currentMarker) currentMarker.classList.remove('active');
+
+                mapContainer.classList.remove('active');
+                mapCard.classList.remove('active');
+                activeMarker = null;
+                return;
+
+            }
+
+            // Activar nuevo marcador.
+            const newMarker = marker._icon.querySelector('.officer-marker-container');
+            if (newMarker) newMarker.classList.add('active');
+
+            activeMarker = marker;
+            updateMapCard(officialData);
+
+            // Forza el reajuste en la anchura del mapa.
+            map.invalidateSize();
+        }
+
+        // INFO: Consulta los datos de los oficiales a mostrar.
+        function fetchPoliceData() {
+            fetch('{% url "dashboard:GeolocationData" %}')
+            .then(response => response.json())
+            .then(data => updateMarkers(data))
+            .catch(error => console.error('Ha ocurrido un error en la consulta de los datos de geolocalización: ', error));
+        };
+
+        // INFO: Gestiona los marcadores en el mapa.
+        function updateMarkers(officers) {
+            let currentIds = [];
+
+            officers.forEach(officer => {
+                currentIds.push(officer.id);
+
+                // Marcador de oficial.
+                var officerMarker = `<div class='officer-marker-container'>
+                    <span class='material-symbols-outlined'>local_police</span>
+                    <div class='officer-plate-label'>${officer.plate_number}</div>
+                </div>`;
+
+                var customIcon = L.divIcon({ html: officerMarker, className: '',
+                    iconSize: [100, 60], iconAnchor: [50, 60] });
+
+                // Coordenadas (actualización constante).
+                const lat = officer.lat;
+                const lng = officer.lng;
+
+                if (!lat || !lng) {
+                    console.warn(`No se han obtenido coordenadas para el oficial: ${officer.name} (${officer.plate_number})`)
+                    return;
+                }
+
+                if (markers[officer.id]) { // Actualiza la posición del oficial.
+                    markers[officer.id].setLatLng([lat, lng]);
+
+                    // Si el marcador está activo, actualiza la tarjeta con los nuevos datos (ej. ubicación)
+                    if (activeMarker === markers[officer.id]) {
+                        updateMapCard(officer);
+                    }
+
+                } else {
+                    // Crea un nuevo marcador.
+                    var newMarker = L.marker([lat, lng], { 
+                        icon: customIcon, officialData: officer 
+                    }).addTo(map);
+
+                    newMarker.on('click', function (element) {
+                        element.target.closePopup(); // Previene el POPUP.
+                        onMarkerClick(officer, element.target);
+                    });
+
+                    if (activeMarker && activeMarker.options.officialData.id === officer.id) {
+                        const Aldrich = newMarker._icon.querySelector('.officer-marker-container');
+                        if (Aldrich) Aldrich.classList.add('active');
+                        activeMarker = newMarker;
+                        updateMapCard(officer);
+                    }
+
+                    markers[officer.id] = newMarker;
+                }
+            });
+
+            // Limpieza de oficiales.
+            for (var id in markers) {
+                if (!currentIds.includes(parseInt(id))) { 
+                    if (activeMarker === markers[id]) {
+                        mapContainer.classList.remove('active');
+                        mapCard.classList.remove('active');
+                        activeMarker = null;
+                        map.invalidateSize();
+                    }
+
+                    map.removeLayer(markers[id]);
+                    delete markers[id];
+                }
+            }
+        }
+
+
+        // Inicializa el mapa (sin tarjeta de información).
+        mapContainer.classList.remove('active');
+        mapCard.classList.remove('active');
+
+        // Forzar el redibujado inicial del mapa (necesario si el contenedor no tiene ancho fijo al inicio).
+        setTimeout(() => { map.invalidateSize(); }, 100);
+        setInterval(fetchPoliceData, 4000);
+        fetchPoliceData();
+    </script>
+
+</div>
+
+{% endblock content %}

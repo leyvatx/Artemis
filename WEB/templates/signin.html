@@ -17,13 +17,11 @@
     <meta name='description' content='Inicio de sesión: Artemis' />
     <meta name='viewport' content='width=device-width, initial-scale=1' />
 
-    <title>Iniciar sesión | Artemis</title>
+    <title>Inicio de sesión | Artemis</title>
     <link rel='shortcut icon' type='image/png' href='{% static "images/favicon.png" %}'>
 
     <link href='{% static "css/main.css" %}' rel='stylesheet' />
     <link href='{% static "css/session.css" %}' rel='stylesheet' />
-
-    <script src='{% static "scripts/main.js" %}' defer></script>
 
     <!-- Google Icons CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
@@ -40,12 +38,12 @@
         <form method='post' class='login-form'>{% csrf_token %}
             <div class='form-group icon-input'>
                 <span class='material-symbols-outlined'>person</span>
-                <input type='text' id='id_username' name='username' placeholder='Nombre de usuario' required>
+                <input type='email' id='email' name='email' placeholder='Correo electrónico' required>
             </div>
 
             <div class='form-group icon-input'>
                 <span class='material-symbols-outlined'>key</span>
-                <input type='password' id='id_password' name='password' placeholder='Contraseña' required>
+                <input type='password' id='password' name='password' placeholder='Contraseña' required>
             </div>
 
             <button type='submit' class='login-button'>Continuar</button>

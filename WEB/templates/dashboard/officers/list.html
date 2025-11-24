@@ -14,7 +14,7 @@
 
         <div class='crud-header-info'>
             <h2>Gestión de oficiales</h2>
-            <span>Usted cuenta con {{ paginator.count }} oficiales a su cargo.</span>
+            <span>Listado de los oficiales a su cargo; actualmente {{ paginator.count }}.</span>
         </div>
 
         <a href='{% url "dashboard:OfficersCreate" %}' class='crud-header-create'>
@@ -50,10 +50,10 @@
                 </ul></li>
 
                 {% for officer in officers %}
-                <li class='list-body'><ul>
+                <li class='list-body' onclick="location.href='{% url 'dashboard:OfficersUpdate' officer.id %}'"><ul>
                     <li>
-                        {% if officer.image %}
-                            <img src='{{ officer.image }}' alt='{{ officer.name }}' />
+                        {% if officer.picture %}
+                            <img src='{{ officer.picture }}' alt='{{ officer.name }}' />
                         {% else %}
                             <img src='{% static "images/unknown.jpeg" %}' alt='{{ officer.name }}' />
                         {% endif %}
@@ -65,23 +65,29 @@
 
                     <li>
                         <span class='grid-range'>
-                            {{ officer.range }}
+                            {{ officer.rank|capfirst }}
                         </span>
                     </li>
 
                     <li class='grid-status'>
-                        {% if officer.status == "Activo" or officer.status == "En servicio" %}
-                            <span class='grid-active'>{{ officer.status }}</span>
+                        {% if officer.status == 'Active' %}
+                            <span class='grid-active'>Activo</span>
+                        {% elif officer.status == 'Inactive' %}
+                            <span class='grid-inactive'>Inactivo</span>
+                        {% elif officer.status == 'Suspended' %}
+                            <span class='grid-suspended'>Suspendido</span>
+                        {% elif officer.status == 'OnLeave' %}
+                            <span class='grid-onleave'>Fuera de servicio</span>
                         {% else %}
-                            <span class='grid-inactive'>{{ officer.status }}</span>
+                            <span class='grid-unknown'>{{ officer.status }}</span>
                         {% endif %}
                     </li>
 
                     <li class='grid-actions'>
-                        <a href='{% url "dashboard:OfficersUpdate" officer.id %}' class='grid-update'>
+                        <a href='{% url "dashboard:OfficersUpdate" officer.id %}' class='grid-update' onclick='event.stopPropagation()'>
                             <span class='material-symbols-outlined'>edit</span>
                             <strong>Editar</strong></a>
-                        <a href='{% url "dashboard:OfficersDelete" officer.id %}' class='grid-delete'>
+                        <a href='{% url "dashboard:OfficersDelete" officer.id %}' class='grid-delete' onclick='event.stopPropagation()'>
                             <span class='material-symbols-outlined'>delete</span>
                             <strong>Eliminar</strong></a>
                     </li>

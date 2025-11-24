@@ -1,3 +1,4 @@
+
 {% extends 'main.html' %}{% load static %}
 
 {% block stylesheet %}
@@ -7,62 +8,86 @@
 {% block title %}{{ titleSection }}{% endblock title %}
 
 
-{% block content%}
+{% block content %}
 <div class='dashboard-container'>
 
-    
-    <header class="crud-header">
-        <div class="crud-header-info">
-            <h2>Editar oficial</h2>
+    <header class='crud-header'>
+        <div class='crud-header-info'>
+            <h2>Edición de oficial</h2>
             <span>Modifique la información del oficial seleccionado.</span>
         </div>
 
-        <a href="{% url 'dashboard:OfficersList' %}" class="crud-header-back">
-            <span class="material-symbols-outlined">arrow_back</span>
-            <strong>Volver</strong>
+        <a href="{% url 'dashboard:OfficersList' %}" class='crud-header-back'>
+            <span class='material-symbols-outlined'>arrow_back</span>
+            <strong>Regresar</strong>
         </a>
     </header>
 
-    <section class="crud-form">
-        <form method="POST">
-            {% csrf_token %}
+    <section class='crud-form'>
+        <form method='POST' enctype='multipart/form-data'>{% csrf_token %}
 
-            <div class="form-grid">
+            <div class='form-grid'>
 
-                <div class="form-control">
+                <div class='form-control'>
                     <label>Nombre completo</label>
-                    <input type="text" name="name" maxlength="32"
-                           value="{{ officer.name }}" required />
+                    <input type='text' name='name' value="{{ officer.name|default:'' }}"
+                        maxlength='64' required placeholder='Ej. John Doe' />
                 </div>
 
-                <div class="form-control">
+                <div class='form-control'>
+                    <label>Correo electrónico</label>
+                    <input type='email' name='email' value="{{ officer.email|default:'' }}"
+                        maxlength='128' required placeholder='solaire@astora.sun' />
+                </div>
+
+                <div class='form-control'>
+                    <label>Número de placa</label>
+                    <input type='text' name='badge_number' value="{{ officer.badge_number|default_if_none:'' }}"
+                        maxlength='18' required placeholder='Ej. P-####' />
+                </div>
+
+                <div class='form-control'>
                     <label>Rango</label>
-                    <input type="text" name="range" maxlength="32"
-                           value="{{ officer.range }}" required />
-                </div>
+                    <select name='rank' required>
+                        <option value='' disabled {% if not officer.rank %}selected{% endif %}>Seleccione un rango.</option>
 
-                <div class="form-control">
-                    <label>Estado</label>
-                    <select name="status" required>
-                        <option value="Activo" {% if officer.status == "Activo" %}selected{% endif %}>Activo</option>
-                        <option value="En servicio" {% if officer.status == "En servicio" %}selected{% endif %}>En servicio</option>
-                        <option value="Fuera de servicio" {% if officer.status == "Fuera de servicio" %}selected{% endif %}>Fuera de servicio</option>
-                        <option value="Suspendido" {% if officer.status == "Suspendido" %}selected{% endif %}>Suspendido</option>
+                        <option value='cabo' {% if officer.rank == 'cabo' %}selected{% endif %}>Cabo</option>
+                        <option value='policia' {% if officer.rank == 'policia' %}selected{% endif %}>Policía</option>
+                        <option value='sargento' {% if officer.rank == 'sargento' %}selected{% endif %}>Sargento</option>
+                        <option value='teniente' {% if officer.rank == 'teniente' %}selected{% endif %}>Teniente</option>
+                        <option value='capitan' {% if officer.rank == 'capitan' %}selected{% endif %}>Capitán</option>
+                        <option value='coronel' {% if officer.rank == 'coronel' %}selected{% endif %}>Coronel</option>
+                        <option value='comandante' {% if officer.rank == 'comandante' %}selected{% endif %}>Comandante</option>
+                        <option value='inspector' {% if officer.rank == 'inspector' %}selected{% endif %}>Inspector</option>
+                        <option value='comisario' {% if officer.rank == 'comisario' %}selected{% endif %}>Comisario</option>
                     </select>
                 </div>
 
-                <div class="form-control">
-                    <label>Fotografía (URL)</label>
-                    <input type="text" name="image" maxlength="256"
-                           value="{{ officer.image }}" />
+                <div class='form-control'>
+                    <label>Estado</label>
+                    <select name='status' required>
+                        <option value='Active' {% if officer.status == 'Active' %}selected{% endif %}>Activo</option> 
+                        <option value='Inactive' {% if officer.status == 'Inactive' %}selected{% endif %}>Inactivo</option>
+                        <option value='Suspended' {% if officer.status == 'Suspended' %}selected{% endif %}>Suspendido</option>
+                        <option value='OnLeave' {% if officer.status == 'OnLeave' %}selected{% endif %}>Fuera de servicio</option>
+                    </select>
                 </div>
 
+                <div class='form-control file-image'>
+                    <label>Fotografía</label>
+
+                    {% if officer.picture %}
+                        <a class='picture-preview' href='{{ officer.picture }}' target='_blank'>Mostrar foto actual</a>
+                    {% endif %}
+               
+                    <input type='file' name='picture' accept='image/*' />
+                </div>
             </div>
 
-            <div class="form-actions">
-                <button type="submit" class="action-save">
-                    <span class="material-symbols-outlined">save</span>
-                    Guardar cambios
+            <div class='form-actions'>
+                <button type='submit' class='action-save'>
+                    <span class='material-symbols-outlined'>save</span>
+                    <strong>Actualizar</strong>
                 </button>
             </div>
 
@@ -70,6 +95,4 @@
     </section>
 
 </div>
-
-
 {% endblock content %}

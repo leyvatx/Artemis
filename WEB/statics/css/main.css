@@ -16,7 +16,7 @@
 :root {
     /* Colores usados en la UI */
     --border-color: #D7E0DF;
-    --canvas-color: #FFFAFA;
+    --canvas-color: #EEEEEE;
     --background-color: #F6F8F8;
 
     --text-primary: #242D2D;
@@ -25,7 +25,7 @@
 
 
     /* Colores usados en los botones */
-    --state-idle: #AEC3B0;
+    --state-idle: #A8B7C0;
     --state-hover: #598392;
     --state-active: #124559;
     --state-inactive: #C5CACB;
@@ -151,18 +151,40 @@ button:disabled {
 }
 
 input {
+    box-shadow: none;
     border: none; outline: none;
-    box-shadow: none; background: none;
 }
 
-input:-webkit-autofill, input:-webkit-autofill:hover,
-input:-webkit-autofill:focus, textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover, textarea:-webkit-autofill:focus,
-select:-webkit-autofill, select:-webkit-autofill:hover,
-select:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--text-secondary);
-    -webkit-box-shadow: 0 0 0px 1000px transparent inset;
-    transition: background-color 5000s ease-in-out 0s;
+input, textarea {
+    background-color: transparent !important;
+}
+
+select, ::picker(select) {
+    outline: none;
+    appearance: base-select;
+}
+
+select::picker-icon {
+    transition: .4 rotate;
+    color: var(--text-disabled);
+}
+
+select:open::picker-icon {
+    rotate: -90deg;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    box-shadow: 0 0 0px 1000px transparent inset !important;
+
+    background-clip: content-box !important;
+    -webkit-text-fill-color: var(--state-idle) !important;
+    transition: background-color 9999s ease-in-out !important;
 }
 
 /* -------------------------------------------------------------------------- */

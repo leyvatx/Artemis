@@ -1,3 +1,4 @@
+
 {% extends 'main.html' %}{% load static %}
 
 {% block stylesheet %}
@@ -10,55 +11,77 @@
 {% block content%}
 <div class='dashboard-container'>
 
-    <header class="crud-header">
-        <div class="crud-header-info">
-            <h2>Registrar nuevo oficial</h2>
-            <span>Complete la información para añadir un nuevo oficial.</span>
+    <header class='crud-header'>
+        <div class='crud-header-info'>
+            <h2>Registro de oficial</h2>
+            <span>Complete la información para registrar un nuevo oficial.</span>
         </div>
 
-        <a href="{% url 'dashboard:OfficersList' %}" class="crud-header-back">
-            <span class="material-symbols-outlined">arrow_back</span>
-            <strong>Volver</strong>
+        <a href="{% url 'dashboard:OfficersList' %}" class='crud-header-back'>
+            <span class='material-symbols-outlined'>arrow_back</span>
+            <strong>Regresar</strong>
         </a>
     </header>
 
-    <section class="crud-form">
-        <form method="POST" enctype="multipart/form-data" autocomplete="off">
-            {% csrf_token %}
+    <section class='crud-form'>
+        <form method='POST' enctype='multipart/form-data' autocomplete='off'>{% csrf_token %}
 
-            <div class="form-grid">
+            <div class='form-grid'>
 
-                <div class="form-control">
+                <div class='form-control'>
                     <label>Nombre completo</label>
-                    <input type="text" name="name" maxlength="32" required />
+                    <input type='text' name='name' maxlength='64' required placeholder='Ej. John Doe' />
                 </div>
 
-                <div class="form-control">
+                <div class='form-control'>
+                    <label>Correo electrónico</label>
+                    <input type='email' name='email' maxlength='128' required placeholder='solaire@astora.sun' />
+                </div>
+
+                <div class='form-control'>
+                    <label>Número de placa</label>
+                    <input type='text' name='badge_number' maxlength='18' required placeholder='Ej. P-####' />
+                </div>
+
+                <div class='form-control'>
                     <label>Rango</label>
-                    <input type="text" name="range" maxlength="32" required />
-                </div>
+                    <select name='rank' required>
+                        <option value='' selected disabled>Seleccione un rango.</option>
 
-                <div class="form-control">
-                    <label>Estado</label>
-                    <select name="status" required>
-                        <option value="Activo">Activo</option>
-                        <option value="En servicio">En servicio</option>
-                        <option value="Fuera de servicio">Fuera de servicio</option>
-                        <option value="Suspendido">Suspendido</option>
+                        <option value='cabo'>Cabo</option>
+                        <option value='policia'>Policía</option>
+                        <option value='sargento'>Sargento</option>
+                        <option value='teniente'>Teniente</option>
+                        <option value='capitan'>Capitán</option>
+                        <option value='coronel'>Coronel</option>
+                        <option value='comandante'>Comandante</option>
+                        <option value='inspector'>Inspector</option>
+                        <option value='comisario'>Comisario</option>
                     </select>
                 </div>
 
-                <div class="form-control">
-                    <label>Fotografía (URL o archivo)</label>
-                    <input type="text" name="image" maxlength="256" placeholder="https://ejemplo.com/foto.jpg" />
+                <div class='form-control'>
+                    <label>Estado</label>
+                    <select name='status' required>
+                        <option value='' selected disabled>Seleccione el estado inicial.</option>
+
+                        <option value='Active'>Activo</option> 
+                        <option value='Inactive'>Inactivo</option>
+                        <option value='Suspended'>Suspendido</option>
+                        <option value='OnLeave'>Fuera de servicio</option>
+                    </select>
                 </div>
 
+                <div class='form-control file-image'>
+                    <label>Fotografía</label>
+                    <input type='file' name='picture' accept='image/*' />
+                </div>
             </div>
 
-            <div class="form-actions">
-                <button type="submit" class="action-save">
-                    <span class="material-symbols-outlined">check</span>
-                    Guardar oficial
+            <div class='form-actions'>
+                <button type='submit' class='action-save'>
+                    <span class='material-symbols-outlined'>check</span>
+                    <strong>Guardar</strong>
                 </button>
             </div>
 
@@ -66,6 +89,4 @@
     </section>
     
 </div>
-
-
 {% endblock content %}

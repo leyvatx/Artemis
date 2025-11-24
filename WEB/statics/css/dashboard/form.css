@@ -6,11 +6,10 @@
 }
 
 .crud-header {
-    align-items: center;
-    width: 100%;
-    padding: 2rem 0;
-    justify-content: space-between;
     display: flex;
+    align-items: center;
+    width: 100%; padding: 2rem 0;
+    justify-content: space-between;
 }
 
 .crud-header-info h2 {
@@ -22,14 +21,17 @@
 
 .crud-header-info span {
     padding-top: .5rem;
-    color: var(--text-secondary);
     text-transform: uppercase;
+    color: var(--text-secondary);
 }
+
+/* -------------------------------------------------------------------------- */
 
 .crud-header-back {
     padding: .8rem 1.6rem;
     align-items: center;
-    display: flex;
+    display: flex; flex-wrap: nowrap;
+    background-color: var(--info-background);
     border: .0125rem solid var(--info-border);
 }
 
@@ -60,36 +62,128 @@
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-    gap: 2rem;
     margin-bottom: 2rem;
+    width: 60%; gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
 }
 
 .form-control {
+    gap: .5rem;
     display: flex;
     flex-direction: column;
 }
 
 .form-control label {
+    font-weight: 600;
+    font-size: .95rem;
     margin-bottom: .5rem;
     text-transform: uppercase;
     color: var(--text-secondary);
 }
 
-.form-control input,
-.form-control select {
+.form-control input {
     padding: 1rem;
     border-radius: .4rem;
-    background-color: var(--canvas-color);
     color: var(--text-primary);
+    background-color: var(--canvas-color);
     border: .0125rem solid var(--border-color);
-    outline: none;
 }
 
-.form-control input:focus,
-.form-control select:focus {
+.form-control input:focus, .form-control select:focus {
     border-color: var(--info-border);
 }
+
+/* -------------------------------------------------------------------------- */
+
+.form-control select {
+    padding: 1rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    background-color: var(--canvas-color);
+    border: .0125rem solid var(--border-color);
+}
+
+.form-control select:focus {
+    background-color: var(--background-color);
+}
+
+::picker(select) {
+    scrollbar-width: none;
+    border-radius: .4rem;
+    margin-block-end: .5rem;
+    margin-block-start: .5rem; 
+    border: .0125rem solid var(--border-color);
+}
+
+.form-control select option {
+    display: flex;
+    padding: .75rem; gap: .5rem;
+    justify-content: flex-start;
+    background-color: var(--canvas-color);
+}
+
+.form-control select option:hover {
+    background-color: var(--border-color);
+}
+
+.form-control select option[disabled] {
+    background-color: var(--border-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.form-control.file-image input[type='file'] {
+    border: none;
+    font-size: .92rem;
+    color: var(--text-primary);
+}
+
+.form-control.file-image input[type='file']::-webkit-file-upload-button {
+    visibility: hidden; display: none;
+}
+
+.form-control.file-image input[type='file']::before {
+    cursor: pointer;
+    font-weight: 600;
+    width: fit-content;
+    border-radius: .25rem;
+    color: var(--text-secondary);
+    background-color: var(--border-color);
+    padding: 1rem 3rem; margin-right: 1rem;
+
+    content: 'Seleccionar archivo';
+}
+
+.form-control.file-image input[type='file']:hover::before {
+    color: var(--canvas-color);
+    background-color: var(--text-disabled);
+}
+
+.form-control.file-image input[type='file']:active::before {
+    opacity: .8;
+    background-color: var(--text-disabled);
+}
+
+.form-control.file-image input[type='file']::file-selector-button {
+    display: none;
+}
+
+.picture-preview {
+    font-weight: 600;
+    margin-left: 1rem;
+    margin-bottom: .5rem;
+    border-radius: .25rem;
+    max-width: fit-content;
+    color: var(--text-secondary);
+    padding: .75rem; background-color: var(--border-color);
+}
+
+.picture-preview:hover {
+    color: var(--canvas-color);
+    background-color: var(--text-disabled);
+}
+
+/* -------------------------------------------------------------------------- */
 
 .form-actions {
     display: flex;
@@ -97,12 +191,12 @@
 }
 
 .action-save {
-    padding: .9rem 2.5rem;
-    display: flex;
+    padding: .8rem 1.6rem;
     align-items: center;
+    font-weight: bold;
+    display: flex; flex-wrap: nowrap;
     background-color: var(--success-background);
     border: .0125rem solid var(--success-border);
-    cursor: pointer;
 }
 
 .action-save span {
@@ -110,24 +204,29 @@
     color: var(--success-border);
 }
 
+.action-save strong {
+    font-size: medium;
+    font-weight: inherit;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
 .action-save:hover {
     background-color: var(--success-text);
 }
 
 .action-save:hover span,
-.action-save:hover {
+.action-save:hover strong {
     color: var(--canvas-color);
 }
 
 /* -------------------------------------------------------------------------- */
 
 .delete-warning {
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    background: var(--warning-background);
     border-radius: .4rem;
-    margin-bottom: 2rem;
+    display: flex; align-items: center;
+    padding: 2rem; margin-bottom: 2rem;
+    background: var(--warning-background);
 }
 
 .delete-warning span {
@@ -136,18 +235,16 @@
 }
 
 .delete-actions {
-    display: flex;
-    gap: 1rem;
+    display: flex; gap: 1rem;
     justify-content: flex-end;
 }
 
 .action-delete {
-    padding: .9rem 2.5rem;
-    display: flex;
+    padding: .8rem 1.6rem;
     align-items: center;
+    display: flex; flex-wrap: nowrap;
     background-color: var(--error-background);
     border: .0125rem solid var(--warning-border);
-    cursor: pointer;
 }
 
 .action-delete span {
@@ -155,20 +252,20 @@
     color: var(--warning-border);
 }
 
+.action-delete strong {
+    font-size: medium;
+    font-weight: inherit;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
 .action-delete:hover {
     background-color: var(--warning-text);
 }
 
-.action-cancel {
-    padding: .9rem 2.5rem;
-    display: flex;
-    align-items: center;
-    background-color: var(--canvas-color);
-    border: .0125rem solid var(--border-color);
-}
-
-.action-cancel:hover {
-    background-color: var(--border-color);
+.action-delete:hover span,
+.action-delete:hover strong {
+    color: var(--canvas-color);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -1,0 +1,169 @@
+
+/* -- CSS ------------------------------------------------------------------- */
+
+.dashboard-container {
+    padding-inline: 2rem;
+}
+
+.section-header {
+    align-items: center;
+    width: 100%; padding: 2rem 0;
+    justify-content: space-between;
+    display: flex; flex-direction: row;
+}
+
+.section-header-info h2 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+}
+
+.section-header-info span {
+    padding-top: .5rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.map-section {
+    align-items: center;
+    padding-inline: 2rem;
+    justify-content: space-between;
+    display: flex; flex-direction: row;
+}
+
+.map-container {
+    z-index: 140;
+    border-radius: .5rem;
+    width: 100%; height: 70vh;
+    display: flex; flex-direction: column;
+}
+
+.map-container.active {
+    width: 85%;
+}
+
+.map-card {
+    border-radius: .5rem;
+    z-index: 160; right: 6rem;
+    width: auto; height: 55vh;
+    position: absolute; padding: 2rem;
+    display: flex; flex-direction: column;
+
+    visibility: hidden; opacity: 0; 
+    background-color: var(--canvas-color);
+    box-shadow: rgba(149, 157, 165, .2) 0 .5rem 1.5rem;
+}
+
+.map-card.active {
+    visibility: visible;
+    opacity: 1; width: 24rem;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.officer-marker-container {
+    display: flex; flex-direction: column;
+    width: max-content; align-items: center;
+
+    border-radius: .25rem;
+    padding: .75rem; gap: .5rem;
+    backdrop-filter: blur(.25rem);
+    box-shadow: rgba(149, 157, 165, .4) 0 .5rem 1.5rem;
+}
+
+.officer-marker-container:hover {
+    background-color: rgba(36, 45, 45, .8);
+}
+
+.officer-marker-container.active {
+    background-color: #242D2D;
+}
+
+.officer-marker-container span {
+    align-self: center;
+    color: var(--error-text);
+    width: auto; height: 20px;
+}
+
+.officer-marker-container:hover span,
+.officer-marker-container.active span {
+    color: var(--info-text);
+}
+
+.officer-plate-label {
+    font-size: small;
+    font-weight: bold;
+    color: #242D2D;
+}
+
+.officer-marker-container:hover .officer-plate-label,
+.officer-marker-container.active .officer-plate-label {
+    color: #EEEEEE;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.card-info {
+    gap: .5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.officer-name { 
+    margin: 0; 
+    font-size: 1.8rem;
+    color: var(--text-primary);
+}
+
+.officer-badge {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.card-status, .card-location {
+    margin-top: 1rem;
+}
+
+.map-card p {
+    align-items: center; gap: .5rem;
+    display: flex; flex-direction: row;
+}
+
+.map-card strong {
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+.status-indicator {
+    color: #EEEEEE;
+    text-transform: uppercase;
+    font-weight: bold; font-size: .9rem;
+    border-radius: .1rem; padding: .3rem .7rem;
+}
+
+.status-activo { background-color: var(--success-border); }
+.status-inactivo { background-color: var(--error-border); }
+.status-ausente { background-color: var(--warning-border); }
+
+.card-button {
+    margin-top: auto;
+    display: inline-block;
+
+    border-radius: .25rem;
+    padding: .75rem 1.5rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: var(--state-idle);
+    font-weight: bold; text-align: center;
+    box-shadow: rgba(149, 157, 165, .2) 0 .5rem 1.5rem;
+}
+
+.card-button:hover {
+    color: var(--canvas-color);
+    background: var(--state-hover);
+}
+
+/* -------------------------------------------------------------------------- */
