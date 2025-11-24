@@ -7,6 +7,12 @@ from django.urls import path
 # ---------------------------------------------------------------------------- #
 
 officers = [
+    # Detalles de un determinado oficial.
+    path('officers/<int:pk>/', views.OfficerDetailView.as_view(), name='OfficerDetail'),
+
+    # Datos biométricos.
+    path('officers/biometrics/', views.biometric_api, name='OfficerBiometrics'),
+
     # Listado de oficiales:
     path('officers/', views.OfficersListView.as_view(), name='OfficersList'),
 

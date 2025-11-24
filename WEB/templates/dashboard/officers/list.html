@@ -50,7 +50,7 @@
                 </ul></li>
 
                 {% for officer in officers %}
-                <li class='list-body' onclick="location.href='{% url 'dashboard:OfficersUpdate' officer.id %}'"><ul>
+                <li class='list-body' onclick="location.href='{% url 'dashboard:OfficerDetail' officer.id %}'"><ul>
                     <li>
                         {% if officer.picture %}
                             <img src='{{ officer.picture }}' alt='{{ officer.name }}' />

@@ -63,7 +63,7 @@
                         : 'Buscando...'}</p>
                 </div>
 
-                <a href="/officer/${officer.id}/" class='card-button'>Consultar oficial</a>
+                <a href='{% url 'dashboard:OfficerDetail' ${officer.id} %}' class='card-button'>Consultar detalles</a>
             `;
 
             mapContainer.classList.add('active');

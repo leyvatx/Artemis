@@ -1,0 +1,384 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/officer.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block scripts %}
+<script src='https://code.highcharts.com/highcharts.js'></script>
+<script src='https://code.highcharts.com/highcharts-more.js'></script>
+{% endblock scripts %}
+
+{% block title %}Oficial: {{ officer.name }}{% endblock title %}
+
+{% block content %}
+<div class='dashboard-container'>
+    <div class='detail-container'>
+
+        <!-- Información general -->
+        <section class='officer-info'>
+            <div class='info-left'>
+                <img class='officer-picture' src='{{ officer.picture }}' alt='Foto del oficial: {{ officer.name }}'>
+            </div>
+
+            <div class='info-right'>
+                <h1 class='officer-name'>{{ officer.name }}</h1>
+                <span class='officer-rank'>{{ officer.rank|capfirst }}</span>
+
+                <div class='officer-status {{ officer.status|lower }}'>
+                    {{ officer.status_label }}
+                </div>
+
+                <div class='officer-badge'>
+                    <strong>Placa:</strong> {{ officer.badge_number }}
+                </div>
+            </div>
+        </section>
+
+        <!-- Datos biométricos -->
+        <section class='biometrics-section'>
+            <h2>Datos biométricos</h2>
+
+            <div class='biometrics-grid'>
+                <div class='chart-card'>
+                    <div class='chart-title'>
+                        <h4>Frecuencia cardíaca (BPM)</h4>
+                        <strong class='bpm-number' id='currentBPMDisplay'>— BPM</strong>
+                    </div>
+
+                    <div id='bpmChart' class='bpm-chart'></div>
+
+                    <div class='chart-indicators'>
+                        <span class='indicator-low'>Reposo</span>
+                        <span class='indicator-normal'>Normal</span>
+                        <span class='indicator-moderate'>Moderado</span>
+                        <span class='indicator-high'>Intenso</span>
+                        <span class='indicator-risk'>En riesgo</span>
+                    </div>
+                </div>
+
+                <div class='chart-card'>
+                    <div class='chart-title'>
+                        <h4>Nivel de estrés</h4>
+                    </div>
+
+                    <div id='stressChart'></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reportes -->
+        <section class='reports-section'>
+            <h2>Reportes</h2>
+            <div class='placeholder'>No se ha reportado ninguna incidencia.</div>
+        </section>
+
+        <!-- Alertas -->
+        <section class='alerts-section'>
+            <h2>Alertas</h2>
+            <div class='placeholder'>No se han generado alertas recientes.</div>
+        </section>
+    </div>
+</div>
+
+
+<script>
+    // Configuración de tiempo.
+    const INTERVAL_MS = 3000;
+    const WINDOW_POINTS = 20;
+    const STRESS_WINDOW = 10;
+
+    // Parámetros de escala dinámica
+    const BASELINE_MAX = 150;
+    const MULTIPLIER = 1.4;
+    const MIN_ALLOWED_MAX = 100;
+    const MAX_ALLOWED_MAX = 600;
+
+    // RANDOM-WALK walk para semilla inicial.
+    function randomWalk(seed, steps, stepSize = 3, min = 55, max = 140) {
+        const arr = [];
+        let v = seed;
+        for (let i = 0; i < steps; i++) {
+            v += (Math.random() - 0.5) * stepSize;
+            v = Math.max(min, Math.min(max, v));
+            arr.push(Math.round(v));
+        }
+        return arr;
+    }
+
+    // Color por zona BPM
+    function bpmColor(bpm) {
+        if (bpm < 85) return '#2196F3';
+        if (bpm < 110) return '#4CAF50';
+        if (bpm < 135) return '#FFEB3B';
+        if (bpm < 160) return '#FF9800';
+
+        return '#E53935';
+    }
+
+    // Ventana inicial.
+    const now = Date.now();
+    const initialStart = now - (WINDOW_POINTS - 1) * INTERVAL_MS;
+
+    // Sembrar BPM.
+    const bpmSeedValues = randomWalk(80, WINDOW_POINTS);
+    const seededBpm = bpmSeedValues.map((y, i) => {
+        const t = initialStart + i * INTERVAL_MS;
+        return { x: t, y, color: bpmColor(y) };
+    });
+
+    // Sembrar estrés.
+    const stressSeedValues = randomWalk(35, STRESS_WINDOW, 6, 5, 85);
+
+    // Gráfico BPM:
+    const bpmChart = Highcharts.chart('bpmChart', {
+        chart: {
+            type: 'column', backgroundColor: 'transparent',
+            height: 420, marginBottom: 50, animation: true,
+            style: { fontFamily: 'inherit', color: 'inherit' },
+        },
+
+        title: { text: null },
+        legend: { enabled: false },
+
+        xAxis: {
+            type: 'datetime',
+            title: { text: null },
+            labels: {
+                formatter: function () {
+                    return Highcharts.dateFormat('%H:%M:%S', this.value);
+                },
+                style: { fontSize: '12px', color: '#445D5D' }
+            },
+            gridLineWidth: 0,
+            min: initialStart,
+            max: now,
+            tickPixelInterval: 80,
+            startOnTick: false,
+            endOnTick: false,
+            ordinal: false
+        },
+
+        yAxis: {
+            title: { text: null },
+            min: 0,
+            max: BASELINE_MAX,
+            gridLineWidth: 0,
+            labels: {
+                align: 'right', x: -10,
+                style: { fontSize: '12px', color: '#445D5D' }
+            },
+        },
+
+        tooltip: {
+            shared: false,
+            pointFormatter: function () {
+                const formattedTime = Highcharts.dateFormat('%a, %H:%M:%S', this.x);
+                return `<b>${formattedTime}</b><br/>Ritmo cardíaco: <b>${Math.round(this.y)} BPM</b>`;
+            },
+            dateTimeLabelFormats: {
+                millisecond: '%H:%M:%S.%L',
+                second: '%H:%M:%S',
+                minute: '%H:%M',
+                hour: '%H:%M',
+                day: '%e. %b',
+                week: '%e. %b',
+                month: '%b \'%y',
+                year: '%Y'
+            }
+        },
+
+        plotOptions: {
+            column: {
+                pointPadding: 0,
+                groupPadding: 0,
+                borderWidth: 0,
+                pointWidth: 8,
+                animation: { duration: 220, easing: 'easeOutQuad' }
+            },
+            series: {
+                dataLabels: { enabled: false },
+                states: { hover: { enabled: false } },
+                turboThreshold: 0
+            }
+        },
+
+        series: [{
+            name: 'BPM',
+            type: 'column',
+            data: seededBpm
+        }],
+
+        credits: { enabled: false }
+    });
+
+    // Gráfico de estrés:
+    const stressChart = Highcharts.chart('stressChart', {
+        chart: {
+            type: 'gauge', backgroundColor: 'transparent',
+            height: '90%', animation: { duration: 300 },
+            style: { fontFamily: 'inherit', color: 'inherit' },
+        },
+
+        title: { text: null },
+
+        pane: {
+            startAngle: -140,
+            endAngle: 140,
+            background: [{
+                backgroundColor: 'transparent',
+                borderWidth: 0, outerRadius: '100%'
+            }]
+        },
+
+        yAxis: {
+            min: 0,
+            max: 100,
+            tickPosition: 'outside',
+            tickLength: 6,
+            tickWidth: 1,
+            tickColor: '#445D5D',
+            minorTickInterval: null,
+            labels: {
+                distance: 24,
+                style: { color: '#445D5D', fontSize: '12px' }
+            },
+            title: {
+                text: null
+            },
+            plotBands: [
+                { from: 0, to: 30, color: 'rgba(76, 175, 80, .4)' },
+                { from: 30, to: 60, color: 'rgba(255, 235, 59, .4' },
+                { from: 60, to: 85, color: 'rgba(255, 152, 0, .4)' },
+                { from: 85, to: 100, color: 'rgba(229, 57, 53, .4)' }
+            ]
+        },
+
+        plotOptions: {
+            gauge: {
+                dial: {
+                    radius: '80%',
+                    backgroundColor: '#445D5D',
+                    baseWidth: 6,
+                    topWidth: 1,
+                    baseLength: '20%',
+                    rearLength: '-20%'
+                },
+                pivot: {
+                    radius: 0, borderWidth: 0,
+                    backgroundColor: 'transparent',
+
+                }
+            },
+            series: { animation: { duration: 300 } }
+        },
+
+        series: [{
+            name: 'Estrés',
+            data: [stressSeedValues[stressSeedValues.length - 1] || 35],
+            tooltip: { enabled: false },
+            dataLabels: {
+                useHTML: true,
+                formatter: function () {
+                    const v = Math.round(this.y);
+                    const color = (v < 30) ? '#4CAF50' : (v < 60) ? '#FFEB3B' : (v < 85) ? '#FF9800' : '#E53935';
+                    return `<div style="text-align:center">
+                  <div style="font-size:28px; font-weight:600; color:${color}; line-height:1">${v}</div>
+                  <div style="font-size:11px; color:#445D5D; margin-top:2px">Nivel</div>
+                </div>`;
+                },
+                borderWidth: 0,
+                y: 0
+            }
+        }],
+
+        credits: { enabled: false }
+    });
+
+    // Función de actualización:
+    function shiftStress(label, value) {
+        const sSeries = stressChart.series[0];
+        const point = sSeries.points[0];
+
+        // Determinar color según zona.
+        const color = (value < 30) ? '#4CAF50' : (value < 60) ? '#FFEB3B' : (value < 85) ? '#FF9800' : '#E53935';
+        point.update(value, true, { duration: 300 });
+
+        sSeries.update({
+            dial: {
+                backgroundColor: '#445D5D'
+            }
+        }, false);
+
+        stressChart.redraw();
+    }
+
+    function pushUpPoint(series, point) {
+        series.addPoint({ x: point.x, y: 0, color: point.color }, true, true);
+        const last = series.data[series.data.length - 1];
+        setTimeout(() => last.update({ y: point.y, color: point.color }, true), 0);
+    }
+
+    function adjustYAxisDynamic(currentBpm) {
+        const series = bpmChart.series[0];
+        // Valores numéricos recientes.
+        const recentValues = series.data
+            .map(p => (p && typeof p.y === 'number' ? p.y : null))
+            .filter(v => v !== null);
+
+        // Incluir el valor actual.
+        recentValues.push(currentBpm);
+
+        const recentMax = recentValues.length ? Math.max(...recentValues) : currentBpm;
+
+        let targetMax;
+        if (recentMax <= 0) {
+            targetMax = BASELINE_MAX * 2;
+        } else {
+            targetMax = Math.max(BASELINE_MAX, Math.ceil(recentMax * MULTIPLIER));
+        }
+
+        // limitar a rangos razonables.
+        targetMax = Math.min(Math.max(targetMax, MIN_ALLOWED_MAX), MAX_ALLOWED_MAX);
+        bpmChart.yAxis[0].update({ max: targetMax, min: 0 }, false, { duration: 300 });
+    }
+
+    // Actualización de datos:
+    function updateCharts(currentBpm, stress) {
+        const currentTime = Date.now();
+        const color = bpmColor(currentBpm);
+
+        adjustYAxisDynamic(currentBpm);
+        bpmChart.xAxis[0].setExtremes(
+            currentTime - (WINDOW_POINTS - 1) * INTERVAL_MS,
+            currentTime, false);
+        pushUpPoint(bpmChart.series[0], { x: currentTime, y: currentBpm, color });
+
+        // BPM:
+        document.getElementById('currentBPMDisplay').innerText = `${currentBpm} BPM`;
+
+        // Estrés:
+        shiftStress(new Date(currentTime).toLocaleTimeString(), stress);
+    }
+
+    // Valor inicial:
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('currentBPMDisplay').innerText = bpmSeedValues[bpmSeedValues.length - 1] || 80;
+    });
+
+    // ACTUALIZACIÓN AUTOMÁTICA — Llamada a API
+    const BIOMETRICS_URL = '{% url "dashboard:OfficerBiometrics" %}';
+    const badgeNumber = '{{ officer.badge_number }}';
+
+    setInterval(() => {
+        fetch(`${BIOMETRICS_URL}?badge=${badgeNumber}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data.bpm !== 'undefined' && typeof data.stress !== 'undefined') {
+                    updateCharts(data.bpm, data.stress);
+                }
+            })
+            .catch(err => console.error('Error biométrico: ', err));
+    }, INTERVAL_MS);
+</script>
+{% endblock %}

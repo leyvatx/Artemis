@@ -17,16 +17,15 @@ OFFICERS_ENDPOINTS = {
     'ASSIGNMENTS': f'{BASE_URL}/supervisors/assignments/',
 }
 
-
+# Datos biométricos:
+BIOMETRICS_ENDPOINTS = {
+    # TODO: Cambiar esta URL (en espera de creación del Endpoint).
+    'TARNISHED': f'{BASE_URL}/biometrics/{{id}}',
+}
 
 # Alertas:
 ALERTS_ENDPOINTS = {
-    'CRUD': f'{BASE_URL}/alerts/',
-}
-
-# Datos biométricos:
-BIOMETRICS_ENDPOINTS = {
-    'CRUD': f'{BASE_URL}/biometrics/',
+    'LIST': f'{BASE_URL}/alerts/',
 }
 
 # Eventos:

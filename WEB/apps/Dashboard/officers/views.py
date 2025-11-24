@@ -1,13 +1,16 @@
 
 # -- VIEWS ------------------------------------------------------------------- #
 
+import random
+import requests
+
 from django.views import generic
+from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
-import requests
-from django.contrib import messages
 from apps.Dashboard.mixins import LoginRequiredMixin
-from apps.Dashboard.endpoints import OFFICERS_ENDPOINTS
+from apps.Dashboard.endpoints import OFFICERS_ENDPOINTS, BIOMETRICS_ENDPOINTS
 
 # ---------------------------------------------------------------------------- #
 
@@ -57,6 +60,92 @@ def manage_officer(request, officer_id):
         messages.error(request, 'No se ha podido conectar con el servidor.')
 
     return None
+
+# ---------------------------------------------------------------------------- #
+
+# Un pequeño estado 'previo' para simular continuidad.
+LAST_BPM = 78
+LAST_STRESS = 35
+
+# Simulación de datos biométricos.
+def biometric_api(request):
+    badge = request.GET.get('badge')
+
+    if badge == 'P-####':
+        try: # Si el oficial posee ese número de placa, no simula los datos.
+
+            API_URL = BIOMETRICS_ENDPOINTS['TARNISHED'].format(id=badge)
+            response = requests.get(API_URL)
+
+            if response.status_code == 200:
+                data = response.json()
+
+                return JsonResponse({
+                    "bpm": data.get("bpm", BASE_BPM),
+                    "stress": data.get("stress", BASE_STRESS)
+                })
+
+        except requests.exceptions.RequestException:
+            messages.error(request, 'No se ha podido conectar con el servidor.')
+
+    # Para los demás oficiales:
+    bpm, stress = biometric_data()
+
+    return JsonResponse({ "bpm": bpm, "stress": stress })
+
+def biometric_data():
+    global LAST_BPM, LAST_STRESS
+
+    # Variación suave en el estrés.
+    stress_delta = random.gauss(0, 1.2)
+    new_stress = LAST_STRESS + stress_delta
+
+    # Suavizado para evitar saltos bruscos.
+    new_stress = (new_stress * 0.8) + (LAST_STRESS * 0.2)
+    new_stress = max(5, min(100, round(new_stress)))
+
+    # Variación de BPM (relacionado al estrés).
+    target_bpm = 60 + (new_stress * 0.85)
+    bpm_delta = random.gauss(0, 1.8)
+    new_bpm = target_bpm + bpm_delta
+
+    # Suavizado.
+    new_bpm = (new_bpm * 0.75) + (LAST_BPM * 0.25)
+    new_bpm = max(55, min(145, round(new_bpm)))
+
+    # Guardado de valores (para continuidad).
+    LAST_BPM = new_bpm
+    LAST_STRESS = new_stress
+
+    return new_bpm, new_stress
+
+# ---------------------------------------------------------------------------- #
+
+# Información detallada:
+class OfficerDetailView(LoginRequiredMixin, generic.View):
+    template_name = 'dashboard/officers/detail.html'
+    context = {}
+
+    def get(self, request, pk, *args, **kwargs):
+        officer = manage_officer(request, pk)
+
+        if not officer:
+            messages.error(request, 'No se ha podido obtener la información del oficial solicitado.')
+            return redirect('dashboard:OfficersList')
+
+
+        officerStatus = officer.get('status')
+        if not officerStatus:
+            officer['status_label'] = 'Desconocido'
+        else:
+            officer['status_label'] = {
+                'Active': 'Activo',
+                'Inactive': 'Inactivo',
+                'Suspended': 'Suspendido',
+                'OnLeave': 'Fuera de servicio'
+            }.get(officerStatus, officerStatus)
+
+        return render(request, self.template_name, {"officer": officer})
 
 # ---------------------------------------------------------------------------- #
 

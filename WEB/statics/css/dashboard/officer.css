@@ -1,0 +1,161 @@
+
+/* -- CSS ------------------------------------------------------------------- */
+
+.detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; padding: 0 4rem;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.officer-info {
+    padding: 2rem;
+    display: grid; gap: 2rem;
+    grid-template-columns: 14rem auto;
+}
+
+.officer-picture {
+    border-radius: 50%;
+    width: auto; height: 14rem;
+    aspect-ratio: 1 / 1; object-fit: cover;
+    box-shadow: rgba(149, 157, 165, .4) 0 .5rem 1.5rem;
+}
+
+.info-right {
+    padding-left: 1rem;
+    justify-content: center;
+    display: flex; flex-direction: column;
+}
+
+.officer-name {
+    margin: 0;
+    font-size: 2.4rem;
+    text-transform: uppercase;
+}
+
+.officer-rank {
+    font-size: 1.4rem;
+    margin-top: .25rem;
+    color: var(--text-secondary);
+}
+
+.officer-status {
+    width: fit-content;
+    font-size: 1rem;
+    margin-top: .75rem;
+    border-radius: .25rem;
+    padding: .5rem 1.5rem;
+    text-transform: uppercase;
+
+    color: var(--text-secondary);
+    background: var(--canvas-color);
+    border: .0125rem solid var(--border-color);
+}
+
+.officer-status.active {
+    color: var(--success-text);
+    background: var(--success-background);
+    border: .0125rem solid var(--success-border);
+}
+
+.officer-status.inactive {
+    color: var(--error-text);
+    background: var(--error-background);
+    border: .0125rem solid var(--error-border);
+}
+
+.officer-status.suspended {
+    color: var(--warning-text);
+    background: var(--warning-background);
+    border: .0125rem solid var(--warning-border);
+}
+
+.officer-status.onleave {
+    color: var(--info-text);
+    background: var(--info-background);
+    border: .0125rem solid var(--info-border);
+}
+
+.officer-badge {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.biometrics-section, .reports-section,
+.alerts-section {
+    padding: 2rem;
+    border-top: .0125rem solid var(--border-color);
+}
+
+.biometrics-grid {
+    display: grid; gap: 2rem;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.chart-card {
+    padding: 1.75rem;
+    border-radius: .5rem;
+    background: var(--canvas-color);
+}
+
+.chart-title {
+    display: flex; flex-direction: row;
+    align-items: center; justify-content: space-between;
+}
+
+.chart-indicators {
+    display: flex; flex-direction: row;
+    align-items: center; justify-content: space-around;
+}
+
+.indicator-low {
+    color: var(--canvas-color);
+    border-radius: .25rem;
+    padding: .75rem 2rem;
+    background-color: #2196F3;
+}
+.indicator-normal {
+    color: var(--canvas-color);
+    border-radius: .25rem;
+    padding: .75rem 2rem;
+    background-color: #4CAF50;
+}
+.indicator-moderate {
+    color: var(--error-border);
+    border-radius: .25rem;
+    padding: .75rem 2rem;
+    background-color: #FFEB3B;
+}
+.indicator-high {
+    color: var(--canvas-color);
+    border-radius: .25rem;
+    padding: .75rem 2rem;
+    background-color: #FF9800;
+}
+.indicator-risk {
+    color: var(--canvas-color);
+    border-radius: .25rem;
+    padding: .75rem 2rem;
+    background-color: #E53935;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Reportes */
+
+/* -------------------------------------------------------------------------- */
+
+/* Alertas */
+
+/* -------------------------------------------------------------------------- */
+
+.placeholder {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------------- */
