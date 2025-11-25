@@ -8,16 +8,13 @@ class SimpleJWTAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Obtener el token del header Authorization
         auth_header = request.META.get('HTTP_AUTHORIZATION')
         
         if auth_header and auth_header.startswith('Bearer '):
             token = auth_header.split(' ')[1]
             try:
-                # Validar el token
                 UntypedToken(token)
                 
-                # Decodificar el token para obtener los datos del usuario
                 from rest_framework_simplejwt.tokens import AccessToken
                 access_token = AccessToken(token)
                 user_id = access_token.get('user_id')
@@ -25,7 +22,6 @@ class SimpleJWTAuthenticationMiddleware:
                 if user_id:
                     try:
                         user = User.objects.get(id=user_id, status='Active')
-                        # Crear un objeto mock para request.user
                         class AuthenticatedUser:
                             def __init__(self, artemis_user):
                                 self.id = artemis_user.id

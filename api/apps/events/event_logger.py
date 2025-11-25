@@ -11,7 +11,6 @@ from .models import Event
 class EventLogger:
     """Centralized event logging utility."""
     
-    # Biometric Events
     BIOMETRIC_CAPTURE_SUCCESS = 'Biometric_Capture_Success'
     BIOMETRIC_CAPTURE_FAILED = 'Biometric_Capture_Failed'
     FINGERPRINT_REGISTERED = 'Fingerprint_Registered'
@@ -21,18 +20,15 @@ class EventLogger:
     BIOMETRIC_MATCH_FOUND = 'Biometric_Match_Found'
     BIOMETRIC_MATCH_NOT_FOUND = 'Biometric_Match_Not_Found'
     
-    # Geolocation Events
     LOCATION_CHANGED = 'Location_Changed'
     GEOFENCE_VIOLATED = 'Geofence_Violated'
     SUSPICIOUS_LOCATION_ACCESS = 'Suspicious_Location_Access'
     LOCATION_TRACKED = 'Location_Tracked'
     
-    # Recommendation Events
     RECOMMENDATION_GENERATED = 'Recommendation_Generated'
     RECOMMENDATION_ACCEPTED = 'Recommendation_Accepted'
     RECOMMENDATION_REJECTED = 'Recommendation_Rejected'
     
-    # Authentication Events
     LOGIN = 'Login'
     LOGOUT = 'Logout'
     LOGIN_FAILED = 'Login_Failed'
@@ -41,28 +37,23 @@ class EventLogger:
     SESSION_EXPIRED = 'Session_Expired'
     ACCESS_DENIED = 'Access_Denied'
     
-    # Alert and Report Events
     ALERT = 'Alert'
     REPORT = 'Report'
     ALERT_TRIGGERED = 'Alert_Triggered'
     ALERT_RESOLVED = 'Alert_Resolved'
     
-    # User Management Events
     USER_CREATED = 'User_Created'
     USER_DELETED = 'User_Deleted'
     USER_MODIFIED = 'User_Modified'
     ROLE_CHANGED = 'Role_Changed'
     
-    # Configuration Events
     CONFIGURATION_CHANGED = 'Configuration_Changed'
     ADMIN_ACCESS = 'Admin_Access'
     
-    # Data Events
     DATA_EXPORTED = 'Data_Exported'
     DATA_IMPORTED = 'Data_Imported'
     DATA_DELETED = 'Data_Deleted'
     
-    # System Events
     SYSTEM = 'System'
     SYSTEM_ERROR = 'System_Error'
     SYSTEM_WARNING = 'System_Warning'
@@ -85,17 +76,13 @@ class EventLogger:
         Returns:
             Event instance
         """
-        # Resolve user: accept a User instance, a user id (int/str), or an anonymous/None.
         resolved_user = None
         try:
-            # If user is a Django User instance
             if isinstance(user, UserModel):
                 resolved_user = user
-            # AnonymousUser or falsy -> keep None
             elif getattr(user, 'is_authenticated', False) is False:
                 resolved_user = None
             else:
-                # If a numeric id was passed, try to fetch the user
                 if isinstance(user, (int, str)):
                     try:
                         resolved_user = UserModel.objects.get(pk=int(user))
@@ -105,6 +92,9 @@ class EventLogger:
                     resolved_user = None
         except Exception:
             resolved_user = None
+
+        if user_agent is None:
+            user_agent = ''
 
         event = Event.objects.create(
             user=resolved_user,

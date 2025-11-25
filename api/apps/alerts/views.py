@@ -17,7 +17,6 @@ class AlertViewSet(BaseViewSet):
         """Crear una alerta y registrar evento"""
         response = super().create(request, *args, **kwargs)
         
-        # ← NUEVO: Registrar evento de alerta disparada
         alert_data = response.data
         EventLogger.log_event(
             user=request.user,
@@ -33,7 +32,6 @@ class AlertViewSet(BaseViewSet):
         """Eliminar una alerta y registrar evento"""
         response = super().destroy(request, *args, **kwargs)
         
-        # ← NUEVO: Registrar evento de alerta resuelta
         EventLogger.log_event(
             user=request.user,
             title="Alert Resolved",

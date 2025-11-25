@@ -34,15 +34,12 @@ def api_root(request):
 urlpatterns = [
     path('', api_root),
     
-    # API Documentation (Swagger/OpenAPI)
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
-    # Authentication
     path('auth/', include('apps.users.auth_urls')),
     
-    # API Endpoints
     path('roles/', include('apps.users.role_urls')),
     path('users/', include('apps.users.urls')),
     path('supervisors/', include('apps.users.supervisor_urls')),

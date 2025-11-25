@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import AlertType, Alert, ALERT_LEVEL_CHOICES, ALERT_STATUS_CHOICES
+from apps.users.serializers import UserSummarySerializer
 
 
 class AlertTypeSerializer(serializers.ModelSerializer):
@@ -21,16 +22,15 @@ class AlertTypeSerializer(serializers.ModelSerializer):
 
 class AlertSerializer(serializers.ModelSerializer):
     alert_type_name = serializers.CharField(source='type.name', read_only=True)
-    user_name = serializers.CharField(source='user.name', read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
-    acknowledged_by_name = serializers.CharField(source='acknowledged_by.name', read_only=True, allow_null=True)
+    user_summary = UserSummarySerializer(source='user', read_only=True)
+    acknowledged_by_summary = UserSummarySerializer(source='acknowledged_by', read_only=True, allow_null=True)
 
     class Meta:
         model = Alert
         fields = [
-            'id', 'user', 'type', 'user_name', 'user_email', 'alert_type_name',
+            'id', 'user', 'user_summary', 'type', 'alert_type_name',
             'level', 'status', 'description', 'location', 'created_at',
-            'acknowledged_at', 'acknowledged_by', 'acknowledged_by_name',
+            'acknowledged_at', 'acknowledged_by', 'acknowledged_by_summary',
             'resolution_notes', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']

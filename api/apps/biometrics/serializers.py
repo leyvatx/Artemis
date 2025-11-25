@@ -4,7 +4,6 @@ from .models import BPM
 
 
 class BPMSerializer(serializers.ModelSerializer):
-    # Expose only user_id (writeable/readable) instead of nested user object
     user_id = serializers.IntegerField(write_only=False, required=True)
 
     class Meta:
@@ -33,7 +32,6 @@ class BPMSerializer(serializers.ModelSerializer):
         return bpm
 
     def to_representation(self, instance):
-        # Represent as {id, user_id, value}
         ret = super().to_representation(instance)
         ret['user_id'] = instance.user_id if instance.user_id is not None else None
         return ret

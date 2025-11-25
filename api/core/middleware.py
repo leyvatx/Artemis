@@ -13,7 +13,6 @@ class LoggingMiddleware(MiddlewareMixin):
     """Middleware for logging all requests and responses"""
     
     def process_request(self, request):
-        # Safely get user info, handling cases where user might not be set yet
         user_info = 'Anonymous'
         try:
             if hasattr(request, 'user') and request.user.is_authenticated:
@@ -103,7 +102,6 @@ class ExceptionHandlerMiddleware(MiddlewareMixin):
                 status=exception.status_code
             )
         
-        # Generic error response for unhandled exceptions
         return JsonResponse(
             {
                 'success': False,

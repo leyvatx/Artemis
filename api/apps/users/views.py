@@ -36,7 +36,7 @@ class UserViewSet(BaseViewSet):
             supervisor_assignments__isnull=False
         ).distinct()
         
-        serializer = SupervisorSerializer(supervisors, many=True)
+        serializer = SupervisorSerializer(supervisors, many=True, context={'request': request})
         return Response({
             'success': True,
             'count': supervisors.count(),
@@ -53,7 +53,7 @@ class UserViewSet(BaseViewSet):
             officer_assignments__isnull=False
         ).distinct()
         
-        serializer = OfficerSerializer(officers, many=True)
+        serializer = OfficerSerializer(officers, many=True, context={'request': request})
         return Response({
             'success': True,
             'count': officers.count(),
@@ -70,34 +70,28 @@ class UserViewSet(BaseViewSet):
         last_7_days = now - timedelta(days=7)
         last_30_days = now - timedelta(days=30)
         
-        # Conteos generales
         total_users = User.objects.count()
         supervisors = User.objects.filter(supervisor_assignments__isnull=False).distinct().count()
         officers = User.objects.filter(officer_assignments__isnull=False).distinct().count()
         active_users = User.objects.filter(status='Active').count()
         inactive_users = User.objects.filter(status='Inactive').count()
         
-        # Asignaciones
         total_assignments = SupervisorAssignment.objects.count()
         active_assignments = SupervisorAssignment.objects.filter(end_date__isnull=True).count()
         completed_assignments = SupervisorAssignment.objects.filter(end_date__isnull=False).count()
         
-        # Alertas
         total_alerts = Alert.objects.count()
         pending_alerts = Alert.objects.filter(status='Pending').count()
         critical_alerts = Alert.objects.filter(level='Critical').count()
         alerts_last_7_days = Alert.objects.filter(created_at__gte=last_7_days).count()
         alerts_by_level = Alert.objects.values('level').annotate(count=Count('id'))
         
-        # Biometría
         total_biometric_records = BPM.objects.count()
         biometric_last_7_days = BPM.objects.filter(created_at__gte=last_7_days).count()
         
-        # Geolocalización
         total_locations = GeoLocation.objects.count()
         locations_last_7_days = GeoLocation.objects.filter(created_at__gte=last_7_days).count()
         
-        # Eventos
         total_events = Event.objects.count()
         events_last_7_days = Event.objects.filter(created_at__gte=last_7_days).count()
         
@@ -177,14 +171,13 @@ class SupervisorViewSet(viewsets.ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Obtener todas las asignaciones activas del supervisor
         active_assignments = SupervisorAssignment.objects.filter(
             supervisor=supervisor,
             end_date__isnull=True
         ).select_related('officer')
         
         officers = [assignment.officer for assignment in active_assignments]
-        serializer = OfficerSerializer(officers, many=True)
+        serializer = OfficerSerializer(officers, many=True, context={'request': request})
         
         return Response({
             'success': True,
@@ -218,7 +211,6 @@ class SupervisorViewSet(viewsets.ViewSet):
         last_7_days = now - timedelta(days=7)
         last_30_days = now - timedelta(days=30)
         
-        # Oficiales bajo supervisión
         active_officers = SupervisorAssignment.objects.filter(
             supervisor=supervisor,
             end_date__isnull=True
@@ -226,25 +218,20 @@ class SupervisorViewSet(viewsets.ViewSet):
         officer_ids = [a.officer.id for a in active_officers]
         officers_count = len(officer_ids)
         
-        # Alertas de sus oficiales
         total_alerts = Alert.objects.filter(user_id__in=officer_ids).count()
         pending_alerts = Alert.objects.filter(user_id__in=officer_ids, status='Pending').count()
         critical_alerts = Alert.objects.filter(user_id__in=officer_ids, level='Critical').count()
         alerts_last_7_days = Alert.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
         
-        # Biometría de sus oficiales
         biometric_records = BPM.objects.filter(user_id__in=officer_ids).count()
         biometric_last_7_days = BPM.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
         
-        # Ubicaciones de sus oficiales
         location_records = GeoLocation.objects.filter(user_id__in=officer_ids).count()
         location_last_7_days = GeoLocation.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
         
-        # Eventos de sus oficiales
         events = Event.objects.filter(user_id__in=officer_ids).count()
         events_last_7_days = Event.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
         
-        # Estados de los oficiales
         active_officers_count = User.objects.filter(id__in=officer_ids, status='Active').count()
         inactive_officers_count = User.objects.filter(id__in=officer_ids, status='Inactive').count()
         

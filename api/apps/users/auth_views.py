@@ -29,7 +29,6 @@ class AuthViewSet(ViewSet):
         if serializer.is_valid():
             user = serializer.save()
             
-            # Log the registration event
             EventLogger.log_event(
                 user=user,
                 title="User Registered",
@@ -39,9 +38,8 @@ class AuthViewSet(ViewSet):
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
             
-            # Generate tokens
             refresh = RefreshToken.for_user(user)
-            response_serializer = UserAuthSerializer(user)
+            response_serializer = UserAuthSerializer(user, context={'request': request})
             
             return Response(
                 {
@@ -75,14 +73,13 @@ class AuthViewSet(ViewSet):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             
-            # Log the login event
             EventLogger.log_login(
                 user=user,
                 ip_address=self.get_client_ip(request),
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
             
-            response_serializer = UserAuthSerializer(user)
+            response_serializer = UserAuthSerializer(user, context={'request': request})
             
             return Response(
                 {
@@ -93,7 +90,6 @@ class AuthViewSet(ViewSet):
                 status=status.HTTP_200_OK
             )
         
-        # Log failed login attempt
         email = request.data.get('email', 'unknown')
         EventLogger.log_login_failed(
             user=None,
@@ -121,7 +117,6 @@ class AuthViewSet(ViewSet):
         """
         Logout a user.
         """
-        # Log the logout event
         EventLogger.log_logout(
             user=request.user,
             ip_address=self.get_client_ip(request),
@@ -146,7 +141,7 @@ class AuthViewSet(ViewSet):
         """
         Get current user info.
         """
-        serializer = UserAuthSerializer(request.user)
+        serializer = UserAuthSerializer(request.user, context={'request': request})
         return Response(
             {
                 'success': True,

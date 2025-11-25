@@ -2,16 +2,12 @@ from .base import *
 import os
 from decouple import config
 
-# Ensure production mode
 DEBUG = False
 
-# Hosts allowed to serve the application. Prefer configuring via env var
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='yourdomain.com').split(',')
 
-# Production secret key - MUST be provided via environment in real deployments
 SECRET_KEY = config('SECRET_KEY')
 
-# PostgreSQL Database for production
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -25,7 +21,6 @@ DATABASES = {
     }
 }
 
-# Security settings recommended for production
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

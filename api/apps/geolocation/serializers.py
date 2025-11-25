@@ -1,16 +1,16 @@
 from rest_framework import serializers
 from .models import GeoLocation
 from django.core.validators import MinValueValidator, MaxValueValidator
+from apps.users.serializers import UserSummarySerializer
 
 
 class GeoLocationSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.name', read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
+    user_summary = UserSummarySerializer(source='user', read_only=True)
 
     class Meta:
         model = GeoLocation
         fields = [
-            'geolocation_id', 'user', 'user_name', 'user_email',
+            'geolocation_id', 'user', 'user_summary',
             'latitude', 'longitude', 'accuracy', 'location_name',
             'notes', 'created_at', 'updated_at'
         ]

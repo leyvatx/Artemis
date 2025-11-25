@@ -20,11 +20,53 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # Expose only the role id; do not show password_hash, status, timestamps here
+    picture = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'role']
+        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'role', 'status']
         read_only_fields = ['id']
+
+    def validate_status(self, value):
+        allowed = [choice[0] for choice in User.STATUS_CHOICES]
+        if value not in allowed:
+            raise serializers.ValidationError(f"Status must be one of: {', '.join(allowed)}")
+        return value
+
+    def get_picture(self, obj):
+        """Return absolute URL to the picture if possible, else relative URL or None."""
+        if not obj or not getattr(obj, 'picture', None):
+            return None
+        try:
+            url = obj.picture.url
+        except Exception:
+            return None
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+
+class UserSummarySerializer(serializers.ModelSerializer):
+    """Compact user representation for nested responses (no timestamps)."""
+    picture = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status']
+
+    def get_picture(self, obj):
+        """Return absolute URL to the picture if possible, else relative URL or None."""
+        if not obj or not getattr(obj, 'picture', None):
+            return None
+        try:
+            url = obj.picture.url
+        except Exception:
+            return None
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            return request.build_absolute_uri(url)
+        return url
 
     def validate_name(self, value):
         if len(value.strip()) < 2:
@@ -33,7 +75,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_email(self, value):
         email_lower = value.lower()
-        # Check for duplicates excluding the current instance
         qs = User.objects.filter(email=email_lower)
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
@@ -43,7 +84,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_badge_number(self, value):
         if value:
-            # Check for duplicates excluding the current instance
             qs = User.objects.filter(badge_number=value)
             if self.instance:
                 qs = qs.exclude(pk=self.instance.pk)
@@ -72,31 +112,53 @@ class UserDetailSerializer(UserSerializer):
 
 class OfficerSerializer(serializers.ModelSerializer):
     """Clean serializer for officers under a supervisor"""
+    picture = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def get_picture(self, obj):
+        if not obj or not getattr(obj, 'picture', None):
+            return None
+        try:
+            url = obj.picture.url
+        except Exception:
+            return None
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class SupervisorSerializer(serializers.ModelSerializer):
     """Clean serializer for supervisors"""
+    picture = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status', 'created_at']
         read_only_fields = ['id', 'created_at']
 
+    def get_picture(self, obj):
+        if not obj or not getattr(obj, 'picture', None):
+            return None
+        try:
+            url = obj.picture.url
+        except Exception:
+            return None
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
 
 class SupervisorAssignmentSerializer(serializers.ModelSerializer):
-    supervisor_name = serializers.CharField(source='supervisor.name', read_only=True)
-    officer_name = serializers.CharField(source='officer.name', read_only=True)
-    supervisor_email = serializers.CharField(source='supervisor.email', read_only=True)
-    officer_email = serializers.CharField(source='officer.email', read_only=True)
+    """Serializer for creating/updating assignments. Keep supervisor/officer as IDs only."""
 
     class Meta:
         model = SupervisorAssignment
         fields = [
-            'id', 'supervisor', 'officer', 'supervisor_name', 'supervisor_email',
-            'officer_name', 'officer_email', 'start_date', 'end_date', 'notes',
+            'id', 'supervisor', 'officer', 'start_date', 'end_date', 'notes',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['created_at', 'updated_at']
@@ -112,11 +174,9 @@ class SupervisorAssignmentSerializer(serializers.ModelSerializer):
         if supervisor == officer:
             raise serializers.ValidationError("Supervisor and officer cannot be the same person.")
 
-        # Check if supervisor status is Active
         if supervisor.status != 'Active':
             raise serializers.ValidationError({"supervisor": "Supervisor must have Active status."})
 
-        # Check if officer status is Active
         if officer.status != 'Active':
             raise serializers.ValidationError({"officer": "Officer must have Active status."})
 
@@ -125,8 +185,8 @@ class SupervisorAssignmentSerializer(serializers.ModelSerializer):
 
 class CleanSupervisorAssignmentSerializer(serializers.ModelSerializer):
     """Clean serializer for supervisor assignments with nested objects"""
-    supervisor = SupervisorSerializer(read_only=True)
-    officer = OfficerSerializer(read_only=True)
+    supervisor = UserSummarySerializer(read_only=True)
+    officer = UserSummarySerializer(read_only=True)
 
     class Meta:
         model = SupervisorAssignment

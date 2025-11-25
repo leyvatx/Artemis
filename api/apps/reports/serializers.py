@@ -1,15 +1,15 @@
 from rest_framework import serializers
 from .models import Report
+from apps.users.serializers import UserSummarySerializer
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.name', read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
+    user_summary = UserSummarySerializer(source='user', read_only=True)
 
     class Meta:
         model = Report
         fields = [
-            'report_id', 'user', 'user_name', 'user_email',
+            'report_id', 'user', 'user_summary',
             'report_type', 'title', 'content', 'summary', 'status',
             'created_at', 'updated_at', 'generated_at', 'sent_at'
         ]
