@@ -2,6 +2,8 @@ from core.views import BaseViewSet
 from .models import BPM
 from .serializers import BPMSerializer
 from apps.events import EventLogger
+from rest_framework import status
+from rest_framework.response import Response
 
 
 class BPMViewSet(BaseViewSet):
@@ -10,12 +12,33 @@ class BPMViewSet(BaseViewSet):
     serializer_class = BPMSerializer
 
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-
+        data = request.data
+        if not isinstance(data, dict):
+            try:
+                raw = request.body.decode('utf-8').strip()
+                value = float(raw)
+                user_id_hdr = request.META.get('HTTP_X_USER_ID') or request.GET.get('user_id')
+                data = {'value': value}
+                if user_id_hdr:
+                    try:
+                        data['user_id'] = int(user_id_hdr)
+                    except Exception:
+                        pass
+            except Exception:
+                data = request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        response = Response(
+            {'success': True, 'data': serializer.data, 'message': 'Created successfully'},
+            status=status.HTTP_201_CREATED,
+            headers=headers
+        )
         user_id = None
         try:
-            if isinstance(request.data, dict):
-                user_id = request.data.get('user_id')
+            if isinstance(data, dict):
+                user_id = data.get('user_id')
         except Exception:
             user_id = None
 

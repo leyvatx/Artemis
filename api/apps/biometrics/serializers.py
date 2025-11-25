@@ -4,7 +4,7 @@ from .models import BPM
 
 
 class BPMSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(write_only=False, required=True)
+    user_id = serializers.IntegerField(write_only=False, required=False)
 
     class Meta:
         model = BPM
@@ -21,6 +21,16 @@ class BPMSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_id = validated_data.pop('user_id', None)
+        if user_id is None:
+            request = self.context.get('request') if self.context else None
+            if request is not None:
+                hdr = request.META.get('HTTP_X_USER_ID') or request.GET.get('user_id')
+                if hdr is not None:
+                    try:
+                        user_id = int(hdr)
+                    except Exception:
+                        user_id = None
+
         if user_id is None:
             raise serializers.ValidationError({'user_id': 'user_id is required.'})
         try:
