@@ -225,6 +225,12 @@
     color: var(--state-idle);
 }
 
+.supervisor-picture {
+    border-radius: 50%;
+    width: auto; height: 3rem;
+    aspect-ratio: 1 / 1; object-fit: cover;
+}
+
 .user-initial-circle {
     display: flex;
     text-align: center;
@@ -256,6 +262,110 @@
 .main-footer {
     text-align: center;
     background-color: var(--canvas-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    border-radius: .25rem;
+    top: 100%; right: 7rem;
+    min-width: 16rem; padding: 1rem;
+
+    background-color: var(--canvas-color);
+    border: .0125rem solid var(--border-color);
+    box-shadow: 0 .5rem 3rem .5rem var(--background-color);
+}
+
+.dropdown-menu h4 {
+    margin: 0;
+    font-size: 1rem;
+    margin-bottom: .75rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.dropdown-menu ul {
+    list-style: none;
+    margin: 0; padding: 0;
+    border-top: .0125rem solid var(--border-color);
+}
+
+.dropdown-menu ul li {
+    padding: .5rem 0;
+    font-size: .9rem;
+}
+
+/* TODO: Estilización de las notificaciones. */
+
+.dropdown-footer {
+    display: block;
+    font-size: .9rem;
+    border-radius: .25rem;
+    margin-top: .75rem; padding: .75rem;
+    background-color: var(--info-background);
+    color: var(--info-text);
+    text-transform: uppercase;
+    text-align: center; font-weight: bold;
+}
+
+/* -------------------------------------------------------------------------- */
+
+.django-messages {
+    align-self: center;
+    z-index: 220; top: 11rem;
+    position: fixed; gap: .5rem;
+    display: flex; flex-direction: column;
+}
+
+.message {
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+    border-radius: .25rem;
+    box-shadow: 0 .25rem .5rem var(--background-color);
+
+    opacity: 1; text-align: center;
+    transition: opacity 1s ease-in-out, transform .5s ease-in-out;
+}
+
+.message.fade-in {
+    opacity: 0;
+    transform: translateY(-.75rem);
+}
+
+.message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.message.fade-out {
+    opacity: 0;
+    transform: translateY(1rem);
+}
+
+.message.success {
+    background-color: var(--success-background);
+    border: .0125rem solid var(--success-border);
+    color: var(--success-text);
+}
+
+.message.error {
+    background-color: var(--error-background);
+    border: .0125rem solid var(--error-border);
+    color: var(--error-text);
+}
+
+.message.warning {
+    background-color: var(--warning-background);
+    border: .0125rem solid var(--warning-border);
+    color: var(--warning-text);
+}
+
+.message.info {
+    background-color: var(--info-background);
+    border: .0125rem solid var(--info-border);
+    color: var(--info-text);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -1,12 +1,18 @@
 
 # -- ENDPOINTS --------------------------------------------------------------- #
 
-BASE_URL = "http://127.0.0.1:8002" 
+BASE_URL = 'http://127.0.0.1:8002' 
 
 # Autenticación:
 AUTH_ENDPOINTS = {
     'LOGIN': f'{BASE_URL}/auth/login/',
     'REGISTER': f'{BASE_URL}/auth/register/',
+}
+
+# Datos biométricos:
+BIOMETRICS_ENDPOINTS = {
+    # TODO: Cambiar esta URL (en espera de creación del Endpoint).
+    'TARNISHED': f'{BASE_URL}/biometrics/{{id}}',
 }
 
 # Oficiales (por supervisor):
@@ -17,25 +23,18 @@ OFFICERS_ENDPOINTS = {
     'ASSIGNMENTS': f'{BASE_URL}/supervisors/assignments/',
 }
 
-# Datos biométricos:
-BIOMETRICS_ENDPOINTS = {
-    # TODO: Cambiar esta URL (en espera de creación del Endpoint).
-    'TARNISHED': f'{BASE_URL}/biometrics/{{id}}',
+# Reportes:
+REPORTS_ENDPOINTS = {
+    'LIST': f'{BASE_URL}/reports/?supervisor={{id}}',
+    'TARNISHED': f'{BASE_URL}/reports/?officer={{id}}',
+
+    'CREATE': f'{BASE_URL}/reports/',
+    'CINDER': f'{BASE_URL}/reports/{{id}}/',
 }
 
 # Alertas:
 ALERTS_ENDPOINTS = {
     'LIST': f'{BASE_URL}/alerts/',
-}
-
-# Eventos:
-EVENTS_ENDPOINTS = {
-    'CRUD': f'{BASE_URL}/events/',
-}
-
-# Reportes:
-REPORTS_ENDPOINTS = {
-    'CRUD': f'{BASE_URL}/reports/',
 }
 
 # ---------------------------------------------------------------------------- #

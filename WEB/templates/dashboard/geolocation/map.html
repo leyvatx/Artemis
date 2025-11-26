@@ -1,13 +1,13 @@
-
-{% extends 'main.html' %}{% load static %}
+{% extends 'main.html' %}
+{% load static %}
 
 {% block stylesheet %}
-    <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' />
-    <link rel='stylesheet' href='{% static "css/dashboard/map.css" %}' />
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' />
+<link rel='stylesheet' href='{% static "css/dashboard/map.css" %}' />
 {% endblock stylesheet %}
 
 {% block scripts %}
-    <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
+<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
 {% endblock scripts %}
 
 {% block title %}Geolocalización{% endblock title %}
@@ -26,12 +26,23 @@
         <div class='map-container' id='map'></div>
         <div class='map-card' id='map-card'></div>
     </section>
-            
+
+    {# Plantilla de URL resuelta por Django con id temporal 0 #}
+    <script>
+        const officerDetailTemplate = "{% url 'dashboard:OfficerDetail' 0 %}";
+        // Función para construir la URL final reemplazando el '0' por el id real
+        function buildOfficerUrl(id) {
+            // Reemplaza el '0' final, conservando o no la barra final según exista
+            return officerDetailTemplate.replace(/0(\/)?$/, id + (officerDetailTemplate.endsWith('/') ? '/' : ''));
+        }
+    </script>
+
     <script>
         // Datos iniciales del mapa (coordenadas, nivel de zoom):
         const map = L.map('map').setView([32.50063973895581, -116.87675336028973], 14);
         const mapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors', maxZoom: 20 })
+            attribution: '&copy; OpenStreetMap contributors', maxZoom: 20
+        })
 
         mapLayer.addTo(map);
 
@@ -45,6 +56,8 @@
 
         // INFO: Actualiza el contenido de MAP-CARD con la información del oficial seleccionado.
         function updateMapCard(officer) {
+            const officerDetailUrl = buildOfficerUrl(officer.id);
+
             mapCard.innerHTML = `
                 <div class='card-info'>
                     <h4 class='officer-name'>${officer.name}</h4>
@@ -58,12 +71,12 @@
                 </div>
 
                 <div class='card-location'>
-                    <p><strong>Ubicación:</strong> ${officer && officer.lat && officer.lng 
-                        ? `${officer.lat.toFixed(4)}, ${officer.lng.toFixed(4)}` 
-                        : 'Buscando...'}</p>
+                    <p><strong>Ubicación:</strong> ${officer && officer.lat && officer.lng
+                    ? `${officer.lat.toFixed(4)}, ${officer.lng.toFixed(4)}`
+                    : 'Buscando...'}</p>
                 </div>
 
-                <a href='{% url 'dashboard:OfficerDetail' ${officer.id} %}' class='card-button'>Consultar detalles</a>
+                <a href="${officerDetailUrl}" class='card-button'>Consultar detalles</a>
             `;
 
             mapContainer.classList.add('active');
@@ -104,9 +117,9 @@
         // INFO: Consulta los datos de los oficiales a mostrar.
         function fetchPoliceData() {
             fetch('{% url "dashboard:GeolocationData" %}')
-            .then(response => response.json())
-            .then(data => updateMarkers(data))
-            .catch(error => console.error('Ha ocurrido un error en la consulta de los datos de geolocalización: ', error));
+                .then(response => response.json())
+                .then(data => updateMarkers(data))
+                .catch(error => console.error('Ha ocurrido un error en la consulta de los datos de geolocalización: ', error));
         };
 
         // INFO: Gestiona los marcadores en el mapa.
@@ -122,8 +135,10 @@
                     <div class='officer-plate-label'>${officer.plate_number}</div>
                 </div>`;
 
-                var customIcon = L.divIcon({ html: officerMarker, className: '',
-                    iconSize: [100, 60], iconAnchor: [50, 60] });
+                var customIcon = L.divIcon({
+                    html: officerMarker, className: '',
+                    iconSize: [100, 60], iconAnchor: [50, 60]
+                });
 
                 // Coordenadas (actualización constante).
                 const lat = officer.lat;
@@ -144,8 +159,8 @@
 
                 } else {
                     // Crea un nuevo marcador.
-                    var newMarker = L.marker([lat, lng], { 
-                        icon: customIcon, officialData: officer 
+                    var newMarker = L.marker([lat, lng], {
+                        icon: customIcon, officialData: officer
                     }).addTo(map);
 
                     newMarker.on('click', function (element) {
@@ -166,7 +181,7 @@
 
             // Limpieza de oficiales.
             for (var id in markers) {
-                if (!currentIds.includes(parseInt(id))) { 
+                if (!currentIds.includes(parseInt(id))) {
                     if (activeMarker === markers[id]) {
                         mapContainer.classList.remove('active');
                         mapCard.classList.remove('active');
@@ -185,9 +200,9 @@
         mapContainer.classList.remove('active');
         mapCard.classList.remove('active');
 
-        // Forzar el redibujado inicial del mapa (necesario si el contenedor no tiene ancho fijo al inicio).
+        // Forzar el redibujado inicial del mapa.
         setTimeout(() => { map.invalidateSize(); }, 100);
-        setInterval(fetchPoliceData, 4000);
+        setInterval(fetchPoliceData, 3000);
         fetchPoliceData();
     </script>
 

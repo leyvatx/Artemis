@@ -168,6 +168,22 @@
     display: none;
 }
 
+.form-control textarea {
+    padding: .75rem;
+    border-radius: .4rem;
+    color: var(--text-primary);
+    background-color: var(--canvas-color);
+    border: .0125rem solid var(--border-color);
+    
+    resize: vertical; min-height: 3rem;
+    font-size: 1rem; line-height: 1.5;
+}
+
+.form-control textarea:focus {
+    border-color: var(--info-border);
+    background-color: var(--background-color);
+}
+
 .picture-preview {
     font-weight: 600;
     margin-left: 1rem;

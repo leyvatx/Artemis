@@ -1,8 +1,7 @@
-
 {% extends 'main.html' %}{% load static %}
 
 {% block stylesheet %}
-    <link href='{% static "css/dashboard/form.css" %}' rel='stylesheet' />
+<link href='{% static "css/dashboard/form.css" %}' rel='stylesheet' />
 {% endblock stylesheet %}
 
 {% block title %}{{ titleSection }}{% endblock title %}
@@ -30,33 +29,40 @@
 
                 <div class='form-control'>
                     <label>Nombre completo</label>
-                    <input type='text' name='name' maxlength='64' required placeholder='Ej. John Doe' />
+                    <input type='text' name='name' required placeholder='Ej. John Doe'
+                        value='{% if officer_data %}{{ officer_data.name }}{% endif %}' />
                 </div>
 
                 <div class='form-control'>
                     <label>Correo electrónico</label>
-                    <input type='email' name='email' maxlength='128' required placeholder='solaire@astora.sun' />
+                    <input type='email' name='email' required placeholder='solaire@astora.sun'
+                        value='{% if officer_data %}{{ officer_data.email }}{% endif %}' />
                 </div>
 
                 <div class='form-control'>
                     <label>Número de placa</label>
-                    <input type='text' name='badge_number' maxlength='18' required placeholder='Ej. P-####' />
+                    <input type='text' name='badge_number' required placeholder='Ej. P-1234'
+                        value='{% if officer_data %}{{ officer_data.badge_number }}{% endif %}' />
                 </div>
 
                 <div class='form-control'>
                     <label>Rango</label>
                     <select name='rank' required>
                         <option value='' selected disabled>Seleccione un rango.</option>
-
-                        <option value='cabo'>Cabo</option>
-                        <option value='policia'>Policía</option>
-                        <option value='sargento'>Sargento</option>
-                        <option value='teniente'>Teniente</option>
-                        <option value='capitan'>Capitán</option>
-                        <option value='coronel'>Coronel</option>
-                        <option value='comandante'>Comandante</option>
-                        <option value='inspector'>Inspector</option>
-                        <option value='comisario'>Comisario</option>
+                        {% with selected_rank=officer_data.rank|default:'' %}
+                        <option value='cabo' {% if selected_rank == 'cabo' %}selected{% endif %}>Cabo</option>
+                        <option value='policia' {% if selected_rank == 'policia' %}selected{% endif %}>Policía</option>
+                        <option value='sargento' {% if selected_rank == 'sargento' %}selected{% endif %}>Sargento</option>
+                        <option value='teniente' {% if selected_rank == 'teniente' %}selected{% endif %}>Teniente</option>
+                        <option value='capitan' {% if selected_rank == 'capitan' %}selected{% endif %}>Capitán</option>
+                        <option value='coronel' {% if selected_rank == 'coronel' %}selected{% endif %}>Coronel</option>
+                        <option value='comandante' {% if selected_rank == 'comandante' %}selected{% endif %}>Comandante
+                        </option>
+                        <option value='inspector' {% if selected_rank == 'inspector' %}selected{% endif %}>Inspector
+                        </option>
+                        <option value='comisario' {% if selected_rank == 'comisario' %}selected{% endif %}>Comisario
+                        </option>
+                        {% endwith %}
                     </select>
                 </div>
 
@@ -64,11 +70,15 @@
                     <label>Estado</label>
                     <select name='status' required>
                         <option value='' selected disabled>Seleccione el estado inicial.</option>
-
-                        <option value='Active'>Activo</option> 
-                        <option value='Inactive'>Inactivo</option>
-                        <option value='Suspended'>Suspendido</option>
-                        <option value='OnLeave'>Fuera de servicio</option>
+                        {% with selected_status=officer_data.status|default:'Active' %}
+                        <option value='Active' {% if selected_status == 'Active' %}selected{% endif %}>Activo</option>
+                        <option value='Inactive' {% if selected_status == 'Inactive' %}selected{% endif %}>Inactivo
+                        </option>
+                        <option value='Suspended' {% if selected_status == 'Suspended' %}selected{% endif %}>Suspendido
+                        </option>
+                        <option value='OnLeave' {% if selected_status == 'OnLeave' %}selected{% endif %}>Fuera de servicio
+                        </option>
+                        {% endwith %}
                     </select>
                 </div>
 
@@ -87,6 +97,6 @@
 
         </form>
     </section>
-    
+
 </div>
 {% endblock content %}

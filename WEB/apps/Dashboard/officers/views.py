@@ -198,7 +198,7 @@ class OfficersCreateView(LoginRequiredMixin, generic.View):
             "email": request.POST.get('email'),
             "badge_number": request.POST.get('badge_number'),
             "rank": request.POST.get('rank'),
-            # "status": request.POST.get('status', 'Active'),
+            "status": request.POST.get('status', 'Active'),
             "role": 2 # Dado que se estará creando un oficial se usará el ID de su respectivo rol.
         }
 
@@ -214,13 +214,30 @@ class OfficersCreateView(LoginRequiredMixin, generic.View):
             API_CREATE = OFFICERS_ENDPOINTS['CREATE'].format(id=supervisorId)
             responseCreate = requests.post(API_CREATE, data=officerData, files=officerFiles)
 
-            if responseCreate.status_code not in [200, 201]:             
-                messages.error(request, 'Ha ocurrido un error en la creación del oficial.')
-                return render(request, self.template_name, {'titleSection': 'Registrando oficial'})
+            if responseCreate.status_code not in [200, 201]:       
+                responseCreateJSON = responseCreate.json()
+
+                error_context = {
+                    'titleSection': 'Registrando oficial',
+                    'officer_data': officerData # Datos del formulario.
+                }
+
+                if responseCreateJSON.get('role'): # En caso de que no se registrase un rol.
+                    messages.error(request, 'No existe un nivel de usuario para los oficiales.')
+              
+                if responseCreateJSON.get('badge_number'):
+                    messages.error(request, 'El número de placa introducido pertenece a otro oficial.')
+
+                if responseCreateJSON.get('email'):
+                    messages.error(request, 'La dirección de correo introducida pertenece a otro oficial.')
+
+                return render(request, self.template_name, error_context)
 
             responseCreateJSON = responseCreate.json()
             newOfficerData = responseCreateJSON.get('data', {}) 
             newOfficerID = newOfficerData.get('id')
+
+            print(newOfficerID)
 
             if newOfficerID: # Asignación al supervisor.
                 assignmentData = {
@@ -241,7 +258,13 @@ class OfficersCreateView(LoginRequiredMixin, generic.View):
 
         except requests.exceptions.RequestException:
             messages.error(request, 'No se ha podido conectar con el servidor.')
-            return render(request, self.template_name, {'titleSection': 'Registrando oficial'})
+            
+            context = {
+                'titleSection': 'Registrando oficial',
+                'officer_data': officerData # Datos del formulario.
+            }
+
+            return render(request, self.template_name, context)
 
 # ---------------------------------------------------------------------------- #
 

@@ -1,0 +1,97 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/form.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}{{ titleSection }}{% endblock title %}
+
+{% block content %}
+<div class='dashboard-container'>
+
+    <header class='crud-header'>
+        <div class='crud-header-info'>
+            <h2>Registro de reporte</h2>
+            <span>Complete la información para crear un nuevo reporte.</span>
+        </div>
+
+        <a href="{% url 'dashboard:ReportsList' %}" class='crud-header-back'>
+            <span class='material-symbols-outlined'>arrow_back</span>
+            <strong>Regresar</strong>
+        </a>
+    </header>
+
+    <section class='crud-form'>
+        <form method='POST' autocomplete='off'>{% csrf_token %}
+
+            <div class='form-grid'>
+
+                <div class='form-control'>
+                    <label>Oficial</label>
+                    <select name='officer' required>
+                        <option value='' selected disabled>Seleccione un oficial.</option>
+                        {% for officer in officers %}
+                            <option value="{{ officer.id }}"
+                                {% if report_data.officer == officer.id %}selected{% endif %}>
+                                {{ officer.name }} ({{ officer.badge_number }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class='form-control'>
+                    <label>Tipo de reporte</label>
+                    <select name='report_type' required>
+                        <option value='' selected disabled>Seleccione un tipo.</option>
+                        {% with selected_type=report_data.report_type|default:"Diario" %}
+                            <option value="Diario" {% if selected_type == "Diario" %}selected{% endif %}>Diario</option>
+                            <option value="Semanal" {% if selected_type == "Semanal" %}selected{% endif %}>Semanal</option>
+                            <option value="Mensual" {% if selected_type == "Mensual" %}selected{% endif %}>Mensual</option>
+                            <option value="Incidente" {% if selected_type == "Incidente" %}selected{% endif %}>Incidentee</option>
+                        {% endwith %}
+                    </select>
+                </div>
+
+                <div class='form-control'>
+                    <label>Título</label>
+                    <input type='text' name='title' required placeholder='Ej. Patrulla nocturna'
+                        value='{% if report_data %}{{ report_data.title }}{% endif %}' maxlength='32' />
+                </div>
+
+                <div class='form-control'>
+                    <label>Contenido</label>
+                    <textarea name='content' rows='6' required
+                        placeholder='Describa el reporte...'>{% if report_data %}{{ report_data.content }}{% endif %}</textarea>
+                </div>
+
+                <div class='form-control'>
+                    <label>Resumen</label>
+                    <textarea name='summary' rows='3'
+                        placeholder='Resumen breve...'>{% if report_data %}{{ report_data.summary }}{% endif %}</textarea>
+                </div>
+
+                <div class='form-control'>
+                    <label>Estado</label>
+                    <select name='status' required>
+                        <option value='' selected disabled>Seleccione el estado inicial.</option>
+                        {% with selected_status=report_data.status|default:"Borrador" %}
+                            <option value="Borrador" {% if selected_status == "Borrador" %}selected{% endif %}>Borrador</option>
+                            <option value="Archivado" {% if selected_status == "Archivado" %}selected{% endif %}>Archivado</option>
+                            <option value="Generado" {% if selected_status == "Generado" %}selected{% endif %}>Generado</option>
+                        {% endwith %}
+                    </select>
+                </div>
+            </div>
+
+            <div class='form-actions'>
+                <button type='submit' class='action-save'>
+                    <span class='material-symbols-outlined'>check</span>
+                    <strong>Guardar</strong>
+                </button>
+            </div>
+
+        </form>
+    </section>
+
+</div>
+{% endblock content %}

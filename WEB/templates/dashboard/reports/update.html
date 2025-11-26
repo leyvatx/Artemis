@@ -1,0 +1,97 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/form.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}{{ titleSection }}{% endblock title %}
+
+{% block content %}
+<div class='dashboard-container'>
+
+    <header class='crud-header'>
+        <div class='crud-header-info'>
+            <h2>Actualización de reporte</h2>
+            <span>Modifique la información del reporte seleccionado.</span>
+        </div>
+
+        <a href="{% url 'dashboard:ReportsList' %}" class='crud-header-back'>
+            <span class='material-symbols-outlined'>arrow_back</span>
+            <strong>Regresar</strong>
+        </a>
+    </header>
+
+    <section class='crud-form'>
+        <form method='POST' autocomplete='off'>{% csrf_token %}
+
+            <div class='form-grid'>
+
+                <!-- Oficial -->
+                <div class='form-control'>
+                    <label>Oficial</label>
+                    <select name='officer' required>
+                        <option value='' disabled>Seleccione un oficial.</option>
+                        {% for officer in officers %}
+                        <option value="{{ officer.id }}" {% if report.officer == officer.id %}selected{% endif %}>
+                            {{ officer.name }} ({{ officer.badge_number }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Tipo de reporte -->
+                <div class='form-control'>
+                    <label>Tipo de reporte</label>
+                    <select name='report_type' required>
+                        <option value='' disabled>Seleccione un tipo.</option>
+                        <option value="Diario" {% if report.report_type == "Diario" %}selected{% endif %}>Diario</option>
+                        <option value="Semanal" {% if report.report_type == "Semanal" %}selected{% endif %}>Semanal</option>
+                        <option value="Mensual" {% if report.report_type == "Mensual" %}selected{% endif %}>Mensual</option>
+                        <option value="Incidente" {% if report.report_type == "Incidente" %}selected{% endif %}>Incidentee</option>
+                    </select>
+                </div>
+
+                <!-- Título -->
+                <div class='form-control'>
+                    <label>Título</label>
+                    <input type='text' name='title' required placeholder='Ej. Patrulla nocturna'
+                        value='{{ report.title }}' />
+                </div>
+
+                <!-- Contenido -->
+                <div class='form-control'>
+                    <label>Contenido</label>
+                    <textarea name='content' rows='6' required
+                        placeholder='Describa el reporte...'>{{ report.content }}</textarea>
+                </div>
+
+                <!-- Resumen -->
+                <div class='form-control'>
+                    <label>Resumen</label>
+                    <textarea name='summary' rows='3' placeholder='Resumen breve...'>{{ report.summary }}</textarea>
+                </div>
+
+                <!-- Estado -->
+                <div class='form-control'>
+                    <label>Estado</label>
+                    <select name='status' required>
+                        <option value='' disabled>Seleccione el estado.</option>
+                        <option value="Borrador" {% if report.status == "Borrador" %}selected{% endif %}>Borrador</option>
+                        <option value="Archivado" {% if report.status == "Archivado" %}selected{% endif %}>Archivado</option>
+                        <option value="Generado" {% if report.status == "Generado" %}selected{% endif %}>Generado</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class='form-actions'>
+                <button type='submit' class='action-save'>
+                    <span class='material-symbols-outlined'>check</span>
+                    <strong>Actualizar</strong>
+                </button>
+            </div>
+
+        </form>
+    </section>
+
+</div>
+{% endblock content %}

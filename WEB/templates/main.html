@@ -1,4 +1,3 @@
-
 <!-- ----------------------------------------------------------------------- -->
 
 {% load static %}
@@ -22,10 +21,10 @@
 
     <link href='{% static "css/main.css" %}' rel='stylesheet' />
     <link href='{% static "css/dashboard/base.css" %}' rel='stylesheet' />
-    {% block stylesheet %}{% endblock stylesheet %} <!-- Estilos únicos de una determinada plantilla. -->
+    {% block stylesheet %}{% endblock stylesheet %}
 
     <script src='{% static "scripts/main.js" %}' defer></script>
-    {% block scripts %}{% endblock scripts %} <!-- Scripts únicos de una determinada plantilla. -->
+    {% block scripts %}{% endblock scripts %}
 
     <!-- Google Icons CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
@@ -33,87 +32,129 @@
 
 <!-- ----------------------------------------------------------------------- -->
 
-<body> <!-- Estructura base mostrada en todas las secciones del panel de administración. -->
+<body>
 
-<aside class='main-sidebar-container'>
-    <div class='main-sidebar'>
+    <aside class='main-sidebar-container'>
+        <div class='main-sidebar'>
 
-        <!-- Header del SIDEBAR -->
-        <div class='main-sidebar-header'>
-            <img src='{% static "images/mainicon.webp" %}' alt='Artemis (logotipo)'>
-            <h1>Artemis™</h1>
+            <!-- Header del SIDEBAR -->
+            <div class='main-sidebar-header'>
+                <img src='{% static "images/mainicon.webp" %}' alt='Artemis (logotipo)'>
+                <h1>Artemis™</h1>
+            </div>
+
+            <!-- Enlaces de navegación del SIDEBAR -->
+            <nav class='main-sidebar-content'>
+                <a href='{% url "dashboard:Home" %}' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>home</span>
+                    <p>Inicio</p>
+                </a>
+
+                <a href='{% url "dashboard:OfficersList" %}' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>local_police</span>
+                    <p>Oficiales</p>
+                </a>
+
+                <a href='{% url "dashboard:Geolocation" %}' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>location_searching</span>
+                    <p>Geolocalización</p>
+                </a>
+
+                <a href='#' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>planner_review</span>
+                    <p>Análisis</p>
+                </a>
+
+                <a href='{% url "dashboard:ReportsList" %}' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>library_books</span>
+                    <p>Reportes</p>
+                </a>
+            </nav>
+
+            <!-- Footer del SIDEBAR -->
+            <div class='main-sidebar-footer'>
+                <a id='theme-toggle' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>contrast</span>
+                    <p>Cambiar tema</p>
+                </a>
+
+                <a href='{% url "dashboard:Logout" %}' class='main-sidebar-button logout-button'>
+                    <span class='material-symbols-outlined'>logout</span>
+                    <p>Cerrar sesión</p>
+                </a>
+            </div>
+
         </div>
+    </aside>
 
-        <!-- Enlaces de navegación del SIDEBAR -->
-        <nav class='main-sidebar-content'>
-            <a href='{% url "dashboard:Home" %}' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                home</span><p>Inicio</p></a>
+    <main class='main-content'>
+        <header class='main-header'>
 
-            <a href='{% url "dashboard:OfficersList" %}' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                local_police</span><p>Oficiales</p></a>
+            <!-- Botón de activación del SIDEBAR -->
+            <div class='main-header-toggle'>
+                <span class='material-symbols-outlined' id='toggle-main-sidebar'>menu_open</span>
+            </div>
 
-            <a href='{% url "dashboard:Geolocation" %}' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                location_searching</span><p>Geolocalización</p></a>
+            <!-- Área de usuario y notificaciones -->
+            <div class='main-header-user-area'>
 
-            <a href='#' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                planner_review</span><p>Análisis</p></a>
+                <!-- Notificaciones -->
+                <div class='notifications-dropdown'>
+                    <span class='material-symbols-outlined main-header-notifications-icon' id='toggle-notifications'>
+                        notifications
+                    </span>
 
-            <a href='#' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                library_books</span><p>Reportes</p></a>
+                    <div class='dropdown-menu' id='notifications-menu'>
+                        <h4>Notificaciones recientes</h4>
 
-            <a href='#' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                search_activity</span><p>Eventos</p></a>
-        </nav>
+                        <ul>
+                            {% for notification in notifications %}
+                            <li>{{ notification.text }}</li>
+                            {% empty %}
+                            <li>Sin notificaciones.</li>
+                            {% endfor %}
+                        </ul>
 
-        <!-- Footer del SIDEBAR -->
-        <div class='main-sidebar-footer'>
-            <a id='theme-toggle' class='main-sidebar-button'>
-                <span class='material-symbols-outlined'>
-                contrast</span><p>Cambiar tema</p></a>
+                        <a href='#' class='dropdown-footer'>Ver todas</a>
+                    </div>
+                </div>
 
-            <a href='{% url "dashboard:Logout" %}' class='main-sidebar-button logout-button'>
-                <span class='material-symbols-outlined'>
-                logout</span><p>Cerrar sesión</p></a>
+                <!-- Perfil de usuario -->
+                <a class='main-header-user-info' href='#'>
+                    {% if auth_user.picture %}
+                    <img class='supervisor-picture' src='{{ auth_user.picture }}'
+                        alt='Foto del supervisor: {{ auth_user.name }}'>
+                    {% else %}
+                    <span class='user-initial-circle'>{{ auth_user.name|first }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+        </header>
+
+        <!-- Mensajes de Django -->
+        {% if messages %}
+        <div class='django-messages'>
+            {% for message in messages %}
+            <div class='message {{ message.tags }}'>
+                {{ message }}
+            </div>
+            {% endfor %}
         </div>
+        {% endif %}
 
-    </div>
-</aside>
+        <!-- Contenido dinámico -->
+        <section class='main-container'>
+            {% block content %}{% endblock content %}
+        </section>
 
-<main class='main-content'>
-    <header class='main-header'>
-
-        <!-- Botón de activación del SIDEBAR -->
-        <div class='main-header-toggle'>
-            <span class='material-symbols-outlined' id='toggle-main-sidebar'>menu_open</span>
-        </div>
-
-        <!-- Información básica -->
-        <div class='main-header-user-area'>
-            <span class='material-symbols-outlined main-header-notifications-icon'>notifications</span>
-            <a class='main-header-user-info' href='#'>
-                <span class='user-initial-circle'>E</span>
-            </a>
-        </div>
-
-    </header>
-
-    <!-- Contenido a mostrar en cada plantilla. -->
-    <section class='main-container'>
-        {% block content %}{% endblock content %}
-    </section>
-
-    <footer class='main-footer'>
-        <p>© 2025 Artemis. Todos los derechos reservados.</p>
-    </footer>
-</main>
+        <footer class='main-footer'>
+            <p>© 2025 Artemis. Todos los derechos reservados.</p>
+        </footer>
+    </main>
 
 </body>
+
 </html>
 
 <!-- ----------------------------------------------------------------------- -->

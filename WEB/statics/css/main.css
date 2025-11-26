@@ -116,6 +116,7 @@ html, body {
 
 textarea {
     field-sizing: content;
+    outline: none; border: none;
 }
 
 a {

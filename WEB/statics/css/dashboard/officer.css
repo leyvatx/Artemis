@@ -114,31 +114,31 @@
 .indicator-low {
     color: var(--canvas-color);
     border-radius: .25rem;
-    padding: .75rem 2rem;
+    padding: .75rem 1.75rem;
     background-color: #2196F3;
 }
 .indicator-normal {
     color: var(--canvas-color);
     border-radius: .25rem;
-    padding: .75rem 2rem;
+    padding: .75rem 1.75rem;
     background-color: #4CAF50;
 }
 .indicator-moderate {
     color: var(--error-border);
     border-radius: .25rem;
-    padding: .75rem 2rem;
+    padding: .75rem 1.75rem;
     background-color: #FFEB3B;
 }
 .indicator-high {
     color: var(--canvas-color);
     border-radius: .25rem;
-    padding: .75rem 2rem;
+    padding: .75rem 1.75rem;
     background-color: #FF9800;
 }
 .indicator-risk {
     color: var(--canvas-color);
     border-radius: .25rem;
-    padding: .75rem 2rem;
+    padding: .75rem 1.75rem;
     background-color: #E53935;
 }
 

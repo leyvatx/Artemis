@@ -1,0 +1,93 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/detail.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}{{ titleSection }}{% endblock title %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <header class="crud-header">
+        <div class="crud-header-info">
+            <h2>Detalle del reporte</h2>
+            <span>Visualice la información completa del reporte.</span>
+        </div>
+
+        <a href="{% url 'dashboard:ReportsList' %}" class="crud-header-back">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <strong>Regresar</strong>
+        </a>
+    </header>
+
+    <section class="crud-detail">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <strong>Título</strong>
+                <span>{{ report.title }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Tipo</strong>
+                <span>
+                    {% if report.report_type == "Daily" or report.report_type == "Diario" %} Diario
+                    {% elif report.report_type == "Weekly" or report.report_type == "Semanal" %} Semanal
+                    {% elif report.report_type == "Monthly" or report.report_type == "Mensual" %} Mensual
+                    {% elif report.report_type == "Incident" or report.report_type == "Incidente" %} Incidente
+                    {% else %} {{ report.report_type }} {% endif %}
+                </span>
+            </div>
+            <div class="detail-item">
+                <strong>Estado</strong>
+                <span class="
+                    {% if report.status == 'Draft' or report.status == 'Borrador' %}status-draft
+                    {% elif report.status == 'Archived' or report.status == 'Archivado' %}status-archived
+                    {% elif report.status == 'Generated' or report.status == 'Generado' %}status-generated
+                    {% endif %}
+                ">
+                    {% if report.status == "Draft" or report.status == "Borrador" %} Borrador
+                    {% elif report.status == "Archived" or report.status == "Archivado" %} Archivado
+                    {% elif report.status == "Generated" or report.status == "Generado" %} Generado
+                    {% else %} {{ report.status }} {% endif %}
+                </span>
+            </div>
+            <div class="detail-item">
+                <strong>Supervisor</strong>
+                <span>{{ report.supervisor_summary.name }} ({{ report.supervisor_summary.email }})</span>
+            </div>
+            <div class="detail-item">
+                <strong>Oficial</strong>
+                <span>{{ report.officer_summary.name }} ({{ report.officer_summary.badge_number }})</span>
+            </div>
+            <div class="detail-item">
+                <strong>Contenido</strong>
+                <p>{{ report.content }}</p>
+            </div>
+            <div class="detail-item">
+                <strong>Resumen</strong>
+                <p>{{ report.summary|default:"Sin resumen" }}</p>
+            </div>
+            <div class="detail-item">
+                <strong>Creado</strong>
+                <span>{{ report.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="detail-item">
+                <strong>Actualizado</strong>
+                <span>{{ report.updated_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+
+        <div class="detail-actions">
+            <a href="{% url 'dashboard:ReportsUpdate' report.report_id %}" class="action-edit">
+                <span class="material-symbols-outlined">edit</span>
+                <strong>Editar</strong>
+            </a>
+            <a href="{% url 'dashboard:ReportsDelete' report.report_id %}" class="action-delete">
+                <span class="material-symbols-outlined">delete</span>
+                <strong>Eliminar</strong>
+            </a>
+        </div>
+    </section>
+
+</div>
+{% endblock content %}

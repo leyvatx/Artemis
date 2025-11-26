@@ -4,12 +4,17 @@
 from django.urls import path
 from .views import LoginView, LogoutView, HomeView
 
-# URLs de secciones del Dashboard:
+# Sección de análisis (URLs)
 # from .analytics.urls import analytics
-# from .events.urls import events
+
+# Sección de geolocalización (URLs)
 from .geolocation.urls import geolocation
+
+# Sección de oficiales (URLs)
 from .officers.urls import officers
-# from .reports.urls import reports
+
+# Sección de reportes (URLs)
+from .reports.urls import reports
 
 # ---------------------------------------------------------------------------- #
 
@@ -23,6 +28,6 @@ urlpatterns = [
     # Inicio:
     path('', HomeView.as_view(), name='Home'),
 
-] + geolocation + officers
+] + geolocation + officers + reports
 
 # ---------------------------------------------------------------------------- #

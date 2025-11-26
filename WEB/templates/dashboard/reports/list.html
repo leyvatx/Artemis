@@ -1,0 +1,143 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/list.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}Reportes{% endblock title %}
+
+{% block content %}
+<div class='dashboard-container'>
+
+    <header class='crud-header'>
+        <div class='crud-header-info'>
+            <h2>Gestión de reportes</h2>
+            <span>Listado de los reportes generados.</span>
+        </div>
+
+        <a href='{% url "dashboard:ReportsCreate" %}' class='crud-header-create'>
+            <span class='material-symbols-outlined'>add</span>
+            <strong>Crear nuevo reporte</strong>
+        </a>
+    </header>
+
+    <section class='crud-list'>
+
+        <div class='list-filters'>
+            <div class='list-filter'>
+                <form method='GET'>
+                    <input type='text' name='s' id='search-bar' value='{{ search }}'
+                        placeholder='Buscar por título, tipo, estado...' maxlength='32' />
+                </form>
+
+                <div class='list-filter-icon'>
+                    <span class='material-symbols-outlined'>filter_list</span>
+                </div>
+            </div>
+        </div>
+
+        <div class='list-container'>
+            <ul class='list-responsive'>
+
+                <li class='list-head'>
+                    <ul>
+                        <li>Título</li>
+                        <li>Tipo</li>
+                        <li>Estado</li>
+                        <li>Registro</li>
+                        <li>Oficial</li>
+                        <li>Acciones</li>
+                    </ul>
+                </li>
+
+                {% for report in reports %}
+                <li class='list-body' onclick="location.href='{% url 'dashboard:ReportDetail' report.report_id %}'">
+                    <ul>
+                        <li>
+                            <span class='grid-title'>
+                                {{ report.title }}
+                            </span>
+                        </li>
+
+                        <li>
+                            <span class='grid-range'>
+                                {% if report.report_type == "Diario" %}
+                                    Diario
+                                {% elif report.report_type == "Semanal" %}
+                                    Semanal
+                                {% elif report.report_type == "Mensual" %}
+                                    Mensual
+                                {% elif report.report_type == "Incidente" %}
+                                    Incidente
+                                {% else %}
+                                    {{ report.report_type }}
+                                {% endif %}
+                            </span>
+                        </li>
+
+                        <li class='grid-status'>
+                            {% if report.status == 'Borrador' %}
+                            <span class='grid-inactive'>Borrador</span>
+                            {% elif report.status == 'Generado' %}
+                            <span class='grid-active'>Generado</span>
+                            {% elif report.status == 'Archivado' %}
+                            <span class='grid-suspended'>Archivado</span>
+                            {% else %}
+                            <span class='grid-unknown'>{{ report.status }}</span>
+                            {% endif %}
+                        </li>
+
+                        <li>
+                            <span class='grid-date'>
+                                {{ report.created_at|date:"d/m/Y - h:i A" }}
+                            </span>
+                        </li>
+
+                        <li>
+                            <span class='grid-badge'>
+                                {{ report.officer_summary.badge_number }}
+                            </span>
+                        </li>
+
+                        <li class='grid-actions'>
+                            <a href='{% url "dashboard:ReportsUpdate" report.report_id %}' class='grid-update'
+                                onclick='event.stopPropagation()'>
+                                <span class='material-symbols-outlined'>edit</span>
+                                <strong>Editar</strong></a>
+                            <a href='{% url "dashboard:ReportsDelete" report.report_id %}' class='grid-delete'
+                                onclick='event.stopPropagation()'>
+                                <span class='material-symbols-outlined'>delete</span>
+                                <strong>Eliminar</strong></a>
+                        </li>
+                    </ul>
+                </li>
+
+                {% empty %}
+                <li class='grid-body'>Sin datos a mostrar...</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Paginación -->
+        <nav class='pagination'>
+            {% if is_paginated %}
+            <strong class='current-page'>
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </strong>
+
+            <div class='step-links'>
+                {% if page_obj.has_previous %}
+                <a href='?page={{ page_obj.previous_page_number }}&s={{ search }}'
+                    class='step-previous-link'>Anterior</a>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                <a href='?page={{ page_obj.next_page_number }}&s={{ search }}' class='step-next-link'>Siguiente</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </nav>
+    </section>
+
+</div>
+{% endblock content %}
