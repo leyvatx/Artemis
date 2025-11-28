@@ -1,0 +1,27 @@
+# Artemis ML Module - Python Dependencies
+# =========================================
+# 
+# Para instalar todas las dependencias:
+#   pip install -r requirements.txt
+#
+# O si usas conda:
+#   conda install --file requirements.txt
+
+# Core ML Libraries
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Visualization (solo para notebook)
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Jupyter (solo si vas a ejecutar/modificar el notebook)
+jupyter>=1.0.0
+notebook>=6.5.0
+
+# Optional: Para mejorar performance
+joblib>=1.3.0
+
+# Note: Django NO es requerido para el módulo ML
+# El backend Django debe instalar estas dependencias por separado

@@ -1,0 +1,146 @@
+[
+  {
+    "model": "alerts.alerttype",
+    "pk": 1,
+    "fields": {
+      "name": "HR_CRITICAL_LOW",
+      "default_level": "Critical",
+      "description": "Frecuencia cardíaca críticamente baja - Posible bradicardia severa",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 2,
+    "fields": {
+      "name": "HR_CRITICAL_HIGH",
+      "default_level": "Critical",
+      "description": "Frecuencia cardíaca críticamente alta - Posible taquicardia severa",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 3,
+    "fields": {
+      "name": "HR_WARNING_LOW",
+      "default_level": "High",
+      "description": "Frecuencia cardíaca baja - Requiere monitoreo",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 4,
+    "fields": {
+      "name": "HR_WARNING_HIGH",
+      "default_level": "High",
+      "description": "Frecuencia cardíaca alta - Requiere monitoreo",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 5,
+    "fields": {
+      "name": "STRESS_HIGH_RISK",
+      "default_level": "Critical",
+      "description": "Nivel de estrés críticamente alto - Riesgo para la salud",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 6,
+    "fields": {
+      "name": "STRESS_ELEVATED",
+      "default_level": "High",
+      "description": "Nivel de estrés elevado - Se recomienda intervención",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 7,
+    "fields": {
+      "name": "STRESS_MODERATE",
+      "default_level": "Medium",
+      "description": "Nivel de estrés moderado - Monitorear",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 8,
+    "fields": {
+      "name": "ANOMALY_DETECTED",
+      "default_level": "High",
+      "description": "Patrón anómalo detectado por ML - Requiere revisión",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 9,
+    "fields": {
+      "name": "HR_SUDDEN_SPIKE",
+      "default_level": "Medium",
+      "description": "Incremento brusco en frecuencia cardíaca",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 10,
+    "fields": {
+      "name": "HR_SUDDEN_DROP",
+      "default_level": "Medium",
+      "description": "Descenso brusco en frecuencia cardíaca",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 11,
+    "fields": {
+      "name": "HR_VARIABILITY_LOW",
+      "default_level": "Medium",
+      "description": "Variabilidad cardíaca baja - Posible estrés crónico",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "alerts.alerttype",
+    "pk": 12,
+    "fields": {
+      "name": "GENERAL_HEALTH_ALERT",
+      "default_level": "Low",
+      "description": "Alerta general de salud - Revisar métricas",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "is_active": true
+    }
+  }
+]
