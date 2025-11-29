@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            color: #242D2D;
+            background-color: #F6F8F8;
+        }
+
+        .crud-detail {
+            background-color: #F6F8F8;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 3rem 1.5rem #EEEEEE;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #D7E0DF;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-branding {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .report-logo {
+            width: 60px;
+            height: auto;
+        }
+
+        .report-meta h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: #242D2D;
+        }
+
+        .report-meta span {
+            font-size: 0.85rem;
+            color: #445D5D;
+            text-transform: uppercase;
+        }
+
+        .report-title h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #242D2D;
+        }
+
+        .report-title span {
+            font-size: 0.85rem;
+            color: #445D5D;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem 2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-item strong {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            color: #445D5D;
+        }
+
+        .detail-item span,
+        .detail-item p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #242D2D;
+            margin: 0;
+        }
+
+        .status-draft {
+            background-color: #D7E0DF;
+            color: #97B1AF;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            width: fit-content;
+        }
+
+        .status-archived {
+            background-color: rgba(245, 213, 138, .4);
+            color: #EDA632;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            width: fit-content;
+        }
+
+        .status-generated {
+            background-color: rgba(160, 189, 158, .4);
+            color: #61885F;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            width: fit-content;
+        }
+    </style>
+</head>
+<body>
+    <section class="crud-detail">
+
+        <header class="report-header">
+            <div class="report-branding">
+                <img src="{{ STATIC_URL }}images/mainicon.webp" alt="Artemis" class="report-logo" />
+                <div class="report-meta">
+                    <h2>Artemis</h2>
+                    <span>Panel de administración de reportes</span>
+                </div>
+            </div>
+            <div class="report-title">
+                <h2>Reporte: {{ report.title }}</h2>
+                <span>Creado el {{ report.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </header>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <strong>Título</strong>
+                <span>{{ report.title }}</span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Tipo</strong>
+                <span>{{ report.report_type }}</span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Estado</strong>
+                <span class="
+                    {% if report.status == 'Borrador' %}status-draft
+                    {% elif report.status == 'Archivado' %}status-archived
+                    {% elif report.status == 'Generado' %}status-generated
+                    {% endif %}
+                ">{{ report.status }}</span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Supervisor</strong>
+                <span>{{ report.supervisor_summary.name }} ({{ report.supervisor_summary.email }})</span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Oficial</strong>
+                <span>{{ report.officer_summary.name }} ({{ report.officer_summary.badge_number }})</span>
+            </div>
+
+            <div class="detail-item">
+                <strong>Contenido</strong>
+                <p>{{ report.content }}</p>
+            </div>
+
+            <div class="detail-item">
+                <strong>Resumen</strong>
+                <p>{{ report.summary|default:"Sin resumen" }}</p>
+            </div>
+
+            <div class="detail-item">
+                <strong>Última actualización</strong>
+                <span>{{ report.updated_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+
+    </section>
+</body>
+</html>

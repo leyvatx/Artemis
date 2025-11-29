@@ -1,24 +1,74 @@
-
-<!-- ----------------------------------------------------------------------- -->
-
 {% extends 'main.html' %}{% load static %}
 {% block title %}Inicio{% endblock %}
 
 {% block stylesheet %}
-    {% comment %} <link href='{% static "css/testing.css" %}' rel='stylesheet' /> {% endcomment %}
+<link href='{% static "css/dashboard/home.css" %}' rel='stylesheet' />
 {% endblock stylesheet %}
 
-{% block scripts %}
-    {% comment %} <script src='{% static "scripts/main.js" %}'></script> {% endcomment %}
-{% endblock scripts %}
-
-<!-- ----------------------------------------------------------------------- -->
-
 {% block content %}
+<div class='dashboard-container'>
 
-...
+    <!-- Encabezado -->
+    <section class='dashboard-header'>
+        <div>
+            <h2>Centro de monitorización</h2>
+            <p>Bienvenido, {{ supervisor.name }}</p>
+            <small>Última actualización: {{ timestamp|date:"d/m/Y H:i" }}</small>
+        </div>
 
+        <div class='dashboard-nav'>
+            <a href="{% url 'dashboard:OfficersList' %}"><span class='material-symbols-outlined'>groups</span>
+                Oficiales</a>
+            <a href="{% url 'dashboard:ReportsList' %}"><span class='material-symbols-outlined'>description</span>
+                Reportes</a>
+            <a href="{% url 'dashboard:Home' %}"><span class='material-symbols-outlined'>insights</span> Análisis ML</a>
+            <a href="{% url 'dashboard:Geolocation' %}"><span class='material-symbols-outlined'>map</span> Mapa</a>
+        </div>
+    </section>
+
+    <!-- Métricas -->
+    <section class='dashboard-metrics'>
+
+        <div class='metric-card metric-officers'>
+            <div class='metric-header'>
+                <h3>Oficiales registrados</h3>
+                <span class='material-symbols-outlined'>groups</span>
+            </div>
+
+            <div class='metric-body'>
+                <div class='metric-breakdown'>
+                    <h4 class='metric-value'>{{ officers.total }}</h4>
+
+                    <div class='metric-stats'>
+                        <strong>{{ officers.active }} activos</strong>
+                        <strong>{{ officers.inactive }} inactivos</strong>
+                    </div>
+                </div>
+
+                <p class='metric-context'>Supervisa directamente a estos oficiales</p>
+            </div>
+        </div>
+
+        <div class='metric-card metric-reports'>
+            <div class='metric-header'>
+                <h3>Reportes generados</h3>
+                <span class='material-symbols-outlined'>description</span>
+            </div>
+
+            <div class='metric-body'>
+                <div class='metric-breakdown'>
+                    <h4 class='metric-value'>{{ reports.total }}</h4>
+
+                    <div class='metric-stats'>
+                        <strong>{{ reports.last_7_days }} en la última semana</strong>
+                        <strong>{{ reports.total }} en el registro histórico</strong>
+                    </div>
+                </div>
+
+                <p class='metric-context'>Reportes realizados sobre oficiales bajo supervisión</p>
+            </div>
+        </div>
+    </section>
+
+</div>
 {% endblock content %}
-
-<!-- ----------------------------------------------------------------------- -->
- 

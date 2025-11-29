@@ -148,3 +148,10 @@ LOGIN_REDIRECT_URL = '/artemis/'
 LOGOUT_REDIRECT_URL = '/artemis/login/'
 
 # ---------------------------------------------------------------------------- #
+
+# SESSION_COOKIE_HTTPONLY = True
+# CSRF_COOKIE_HTTPONLY = True
+
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# ---------------------------------------------------------------------------- #

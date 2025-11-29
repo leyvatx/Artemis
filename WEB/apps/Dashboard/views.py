@@ -2,8 +2,8 @@
 # -- VIEWS ------------------------------------------------------------------- #
 
 import requests
-from .endpoints import AUTH_ENDPOINTS
 from .mixins import LoginRequiredMixin
+from .endpoints import AUTH_ENDPOINTS, DATA_ENDPOINTS
 
 from django.views import View
 from django.contrib import messages
@@ -71,6 +71,14 @@ class HomeView(LoginRequiredMixin, View):
     template_name = 'dashboard/home.html'
 
     def get(self, request):
-        return render(request, self.template_name, {})
+        auth_user = request.session.get('auth_user', {})
+        supervisorId = auth_user.get('id')
+        API_URL = DATA_ENDPOINTS['HOME'].format(id=supervisorId)
+
+        response = requests.get(API_URL)
+        data = response.json() if response.status_code == 200 else {}
+
+        return render(request, self.template_name, data)
+
 
 # ---------------------------------------------------------------------------- #

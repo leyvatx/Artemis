@@ -172,6 +172,13 @@ class ReportDetailView(LoginRequiredMixin, generic.View):
         }
         return render(request, self.template_name, context)
 
+# Descarga en PDF del reporte:
+class ReportDownloadView(LoginRequiredMixin, generic.View):
+    def get(self, request, pk, *args, **kwargs):
+        # TODO: ...
+        messages.info(request, 'La descarga de PDF aún no está implementada.')
+        return redirect('dashboard:ReportDetail', pk=pk)
+
 # ---------------------------------------------------------------------------- #
 
 # Creación/Registro de reportes:

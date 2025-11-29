@@ -9,6 +9,11 @@ AUTH_ENDPOINTS = {
     'REGISTER': f'{BASE_URL}/auth/register/',
 }
 
+# Datos generales:
+DATA_ENDPOINTS = {
+    'HOME': f'{BASE_URL}/supervisors/{{id}}/statistics/'
+}
+
 # Datos biométricos:
 BIOMETRICS_ENDPOINTS = {
     # TODO: Cambiar esta URL (en espera de creación del Endpoint).

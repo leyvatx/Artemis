@@ -1,79 +1,71 @@
+
 /* -- CSS ------------------------------------------------------------------- */
 
-.dashboard-container {
-    padding-inline: 2rem;
-}
-
-/* Encabezado */
-.crud-header {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 2rem 0;
-    justify-content: space-between;
-}
-
-.crud-header-info h2 {
-    margin: 0;
-    font-weight: bold;
-    font-size: 2rem;
-    text-transform: uppercase;
-    color: var(--text-primary);
-}
-
-.crud-header-info span {
-    padding-top: .5rem;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    font-size: .9rem;
-}
-
-.crud-header-back {
-    padding: .6rem 1.2rem;
-    align-items: center;
-    display: flex;
-    flex-wrap: nowrap;
-    background-color: var(--info-background);
-    border: .0125rem solid var(--info-border);
-    border-radius: .4rem;
-}
-
-.crud-header-back span {
-    margin-right: .5rem;
-    color: var(--info-border);
-}
-
-.crud-header-back strong {
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    font-size: .85rem;
-}
-
-.crud-header-back:hover {
-    background-color: var(--info-text);
-}
-
-.crud-header-back:hover span,
-.crud-header-back:hover strong {
-    color: var(--canvas-color);
+.crud-detail {
+    justify-self: center;
+    border-radius: .5rem;
+    width: 60%; gap: 2rem;
+    margin: 1rem 0; padding: 2rem;
+    background: var(--background-color);
+    box-shadow: 0 0 3rem 1.5rem var(--canvas-color);
 }
 
 /* -------------------------------------------------------------------------- */
-/* Sección de detalle */
 
-.crud-detail {
-    margin-top: 1rem;
-    background: #fff;
-    border-radius: .6rem;
+.report-header {
     padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    max-width: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: .0125rem solid var(--border-color);
 }
 
+.report-branding {
+    align-items: center;
+    display: flex; gap: 1rem;
+}
+
+.report-logo {
+    width: 4rem;
+    height: auto;
+}
+
+.report-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.report-meta h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.6rem; font-weight: bold;
+}
+
+.report-meta span {
+    font-size: .85rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.report-title h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.report-title span {
+    font-size: .85rem;
+    color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------------- */
+
 .detail-grid {
-    display: grid;
+    margin-top: 2rem;
+    padding-inline: 2rem;
+    display: grid; gap: 1.5rem 2rem;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem 2rem;
 }
 
 .detail-item {
@@ -83,37 +75,68 @@
 
 .detail-item strong {
     font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-secondary);
     font-size: .85rem;
     margin-bottom: .25rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
-.detail-item span,
-.detail-item p {
-    color: var(--text-primary);
+.detail-item span, .detail-item p {
     font-size: 1rem;
     line-height: 1.5;
-}
-
-/* Estados visuales */
-.status-draft {
-    color: var(--text-disabled);
-    font-weight: bold;
-}
-
-.status-archived {
-    color: var(--warning-text);
-    font-weight: bold;
-}
-
-.status-generated {
-    color: var(--success-text);
-    font-weight: bold;
+    color: var(--text-primary);
 }
 
 /* -------------------------------------------------------------------------- */
-/* Acciones en detalle */
+
+.report-status {
+    margin-top: 2rem;
+    padding-inline: 2rem;
+    display: flex; flex: 1;
+    align-items: center; gap: 1rem;
+}
+
+.status-draft {
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+    font-weight: bold;
+    width: fit-content;
+    color: var(--text-disabled);
+    background-color: var(--border-color);
+}
+
+.status-archived {
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+    font-weight: bold;
+    width: fit-content;
+    color: var(--warning-text);
+    background-color: var(--warning-background);
+}
+
+.status-generated {
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+    font-weight: bold;
+    width: fit-content;
+    color: var(--success-text);
+    background-color: var(--success-background);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.detail-text, .detail-date {
+    padding-inline: 2rem;
+    display: flex; flex: 1;
+    align-items: center; gap: 1rem;
+}
+
+.detail-date {
+    margin-top: 1rem;
+    justify-content: right;
+}
+
+/* -------------------------------------------------------------------------- */
 
 .detail-actions {
     display: flex;
@@ -165,6 +188,22 @@
     color: var(--canvas-color);
 }
 
+.action-download {
+    background-color: var(--warning-background);
+    border: .0125rem solid var(--warning-border);
+    color: var(--text-secondary);
+}
+
+.action-download span {
+    margin-right: .5rem;
+    color: var(--warning-border);
+}
+
+.action-download:hover {
+    background-color: var(--warning-text);
+    color: var(--canvas-color);
+}
+
 /* -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {
@@ -172,12 +211,10 @@
         grid-template-columns: 1fr;
     }
 
-    .crud-detail {
-        width: 100%;
-    }
-
     .detail-actions {
         flex-direction: column;
         align-items: stretch;
     }
 }
+
+/* -------------------------------------------------------------------------- */
