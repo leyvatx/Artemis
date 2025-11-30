@@ -2,6 +2,7 @@
 # -- VIEWS ------------------------------------------------------------------- #
 
 import requests
+import logging
 from .mixins import LoginRequiredMixin
 from .endpoints import AUTH_ENDPOINTS, DATA_ENDPOINTS
 
@@ -12,6 +13,7 @@ from django.shortcuts import render, redirect
 # ---------------------------------------------------------------------------- #
 
 ''' CLASE: Inicio de sesión '''
+logger = logging.getLogger(__name__)
 class LoginView(View):
     template_name = 'signin.html'
     AUTH_URL = AUTH_ENDPOINTS['LOGIN']
@@ -39,12 +41,18 @@ class LoginView(View):
             return render(request, self.template_name, {})
 
         if response.status_code != 200:
+            try:
+                logger.warning('Auth failed: %s %s', response.status_code, response.text)
+            except Exception:
+                logger.warning('Auth failed: status %s (no body)', response.status_code)
+
             messages.error(request, 'Las credenciales de acceso introducidas son incorrectas.')
             return render(request, self.template_name, {})
 
         tarnished = response.json()
 
         if 'data' not in tarnished:
+            logger.warning('Auth response missing data key: %s', tarnished)
             messages.error(request, 'Respuesta inesperada del servidor de autenticación.')
             return render(request, self.template_name, {})
 
