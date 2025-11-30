@@ -20,20 +20,46 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # Expose only the role id; do not show password_hash, status, timestamps here
+    role_id = serializers.PrimaryKeyRelatedField(
+        source='role',
+        queryset=Role.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
+    picture = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'role']
+        fields = [
+            'id',
+            'name',
+            'email',
+            'badge_number',
+            'rank',
+            'picture',
+            'role_id',
+            'status'
+        ]
         read_only_fields = ['id']
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        request = self.context.get('request')
+        if instance.picture and request:
+            rep['picture'] = request.build_absolute_uri(instance.picture.url)
+        elif instance.picture:
+            rep['picture'] = instance.picture.url
+        return rep
+
     def validate_name(self, value):
-        if len(value.strip()) < 2:
+        value = value.strip()
+        if len(value) < 2:
             raise serializers.ValidationError("Name must be at least 2 characters long.")
-        return value.strip()
+        return value
 
     def validate_email(self, value):
-        email_lower = value.lower()
-        # Check for duplicates excluding the current instance
+        email_lower = value.strip().lower()
         qs = User.objects.filter(email=email_lower)
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
@@ -43,7 +69,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_badge_number(self, value):
         if value:
-            # Check for duplicates excluding the current instance
+            value = value.strip()
             qs = User.objects.filter(badge_number=value)
             if self.instance:
                 qs = qs.exclude(pk=self.instance.pk)
@@ -51,6 +77,13 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("A user with this badge number already exists.")
         return value
 
+    def validate_status(self, value):
+        valid_statuses = dict(User.STATUS_CHOICES)
+        if value not in valid_statuses:
+            raise serializers.ValidationError(
+                f"Invalid status. Choose from: {list(valid_statuses.keys())}"
+            )
+        return value
 
 
 class UserDetailSerializer(UserSerializer):
@@ -72,17 +105,37 @@ class UserDetailSerializer(UserSerializer):
 
 class OfficerSerializer(serializers.ModelSerializer):
     """Clean serializer for officers under a supervisor"""
+    picture = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status', 'created_at']
         read_only_fields = ['id', 'created_at']
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        request = self.context.get('request')
+        if instance.picture and request:
+            rep['picture'] = request.build_absolute_uri(instance.picture.url)
+        elif instance.picture:
+            rep['picture'] = instance.picture.url
+        return rep
 
 
 class SupervisorSerializer(serializers.ModelSerializer):
-    """Clean serializer for supervisors"""
+
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'badge_number', 'rank', 'picture', 'status', 'created_at']
+        fields = [
+            'id',
+            'name',
+            'email',
+            'badge_number',
+            'rank',
+            'picture',
+            'status',
+            'created_at'
+        ]
         read_only_fields = ['id', 'created_at']
 
 
@@ -116,9 +169,6 @@ class SupervisorAssignmentSerializer(serializers.ModelSerializer):
         if supervisor.status != 'Active':
             raise serializers.ValidationError({"supervisor": "Supervisor must have Active status."})
 
-        # Check if officer status is Active
-        if officer.status != 'Active':
-            raise serializers.ValidationError({"officer": "Officer must have Active status."})
 
         return data
 

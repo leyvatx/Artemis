@@ -1,33 +1,37 @@
 from rest_framework import serializers
 from .models import Report
 
-
 class ReportSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.name', read_only=True)
-    user_email = serializers.CharField(source='user.email', read_only=True)
+    officer_summary = serializers.SerializerMethodField()
+    supervisor_summary = serializers.SerializerMethodField()
 
     class Meta:
         model = Report
         fields = [
-            'report_id', 'user', 'user_name', 'user_email',
+            'report_id',
             'report_type', 'title', 'content', 'summary', 'status',
-            'created_at', 'updated_at', 'generated_at', 'sent_at'
+            'created_at', 'updated_at', 'generated_at', 'sent_at',
+            'officer_summary', 'supervisor_summary'
         ]
         read_only_fields = ['created_at', 'updated_at', 'generated_at', 'sent_at']
 
-    def validate_title(self, value):
-        if len(value.strip()) < 3:
-            raise serializers.ValidationError("Title must be at least 3 characters long.")
-        return value.strip()
+    def get_officer_summary(self, obj):
+        officer = obj.officer
+        return {
+            "id": officer.id,
+            "name": officer.name,
+            "badge_number": officer.badge_number,
+            "rank": officer.rank,
+            "status": officer.status,
+            "picture": officer.picture.url if officer.picture else None,
+        }
 
-    def validate_report_type(self, value):
-        valid_types = dict(Report.REPORT_TYPE_CHOICES)
-        if value not in valid_types:
-            raise serializers.ValidationError(f"Invalid report type. Choose from: {list(valid_types.keys())}")
-        return value
-
-    def validate_status(self, value):
-        valid_statuses = dict(Report.STATUS_CHOICES)
-        if value not in valid_statuses:
-            raise serializers.ValidationError(f"Invalid status. Choose from: {list(valid_statuses.keys())}")
-        return value
+    def get_supervisor_summary(self, obj):
+        supervisor = obj.supervisor
+        return {
+            "id": supervisor.id,
+            "name": supervisor.name,
+            "email": supervisor.email,
+            "status": supervisor.status,
+            "role": supervisor.role.name if supervisor.role else None,
+        }

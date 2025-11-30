@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from core.views import BaseViewSet
 from .models import Role, User, SupervisorAssignment
+from apps.reports.models import Report
+
 from .serializers import (
     RoleSerializer, UserSerializer, SupervisorAssignmentSerializer, 
     UserDetailSerializer, OfficerSerializer, SupervisorSerializer,
@@ -74,8 +76,8 @@ class UserViewSet(BaseViewSet):
         total_users = User.objects.count()
         supervisors = User.objects.filter(supervisor_assignments__isnull=False).distinct().count()
         officers = User.objects.filter(officer_assignments__isnull=False).distinct().count()
-        active_users = User.objects.filter(status='Active').count()
-        inactive_users = User.objects.filter(status='Inactive').count()
+        active_users = User.objects.filter(status__in=['Active', 'OnLeave']).count()
+        inactive_users = User.objects.filter(status__in=['Inactive', 'Suspended']).count()
         
         # Asignaciones
         total_assignments = SupervisorAssignment.objects.count()
@@ -98,8 +100,8 @@ class UserViewSet(BaseViewSet):
         locations_last_7_days = GeoLocation.objects.filter(created_at__gte=last_7_days).count()
         
         # Eventos
-        total_events = Event.objects.count()
-        events_last_7_days = Event.objects.filter(created_at__gte=last_7_days).count()
+        total_events = Report.objects.count()
+        events_last_7_days = Report.objects.filter(created_at__gte=last_7_days).count()
         
         return Response({
             'success': True,
@@ -131,7 +133,7 @@ class UserViewSet(BaseViewSet):
                 'total_records': total_locations,
                 'last_7_days': locations_last_7_days,
             },
-            'events': {
+            'reports': {
                 'total': total_events,
                 'last_7_days': events_last_7_days,
             }
@@ -184,7 +186,7 @@ class SupervisorViewSet(viewsets.ViewSet):
         ).select_related('officer')
         
         officers = [assignment.officer for assignment in active_assignments]
-        serializer = OfficerSerializer(officers, many=True)
+        serializer = OfficerSerializer(officers, many=True, context={'request': request})
         
         return Response({
             'success': True,
@@ -241,9 +243,9 @@ class SupervisorViewSet(viewsets.ViewSet):
         location_last_7_days = GeoLocation.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
         
         # Eventos de sus oficiales
-        events = Event.objects.filter(user_id__in=officer_ids).count()
-        events_last_7_days = Event.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
-        
+        events = Report.objects.count()
+        events_last_7_days = Report.objects.filter(created_at__gte=last_7_days).count()
+
         # Estados de los oficiales
         active_officers_count = User.objects.filter(id__in=officer_ids, status='Active').count()
         inactive_officers_count = User.objects.filter(id__in=officer_ids, status='Inactive').count()
@@ -277,7 +279,7 @@ class SupervisorViewSet(viewsets.ViewSet):
                 'total_records': location_records,
                 'last_7_days': location_last_7_days,
             },
-            'events': {
+            'reports': {
                 'total': events,
                 'last_7_days': events_last_7_days,
             }

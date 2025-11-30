@@ -6,7 +6,7 @@ from decouple import config
 DEBUG = False
 
 # Hosts allowed to serve the application. Prefer configuring via env var
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='yourdomain.com').split(',')
+ALLOWED_HOSTS = ['*']
 
 # Production secret key - MUST be provided via environment in real deployments
 SECRET_KEY = config('SECRET_KEY')

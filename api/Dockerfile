@@ -20,6 +20,6 @@ RUN mkdir -p logs staticfiles media
 # Collect static files
 RUN python manage.py collectstatic --noinput || true
 
-EXPOSE 8000
+EXPOSE 8002
 
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]

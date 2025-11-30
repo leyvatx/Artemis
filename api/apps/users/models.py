@@ -32,15 +32,52 @@ class User(models.Model):
     
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=150, unique=True, validators=[EmailValidator()])
-    password_hash = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Active', db_index=True)
-    badge_number = models.CharField(max_length=50, unique=True, null=True, blank=True, db_index=True, help_text="Número de placa del oficial de policía")
-    rank = models.CharField(max_length=100, null=True, blank=True, help_text="Rango del oficial de policía")
-    picture = models.ImageField(upload_to='officers/', null=True, blank=True, help_text="Fotografía del oficial")
+    email = models.EmailField(
+        max_length=150,
+        unique=True,
+        validators=[EmailValidator()]
+    )
+    password_hash = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Hash de la contraseña (puede ser nulo si se gestiona externamente)"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='Active',
+        db_index=True
+    )
+    badge_number = models.CharField(
+        max_length=50,
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Número de placa del oficial de policía"
+    )
+    rank = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Rango del oficial de policía"
+    )
+    picture = models.ImageField(
+        upload_to='officers/',
+        null=True,
+        blank=True,
+        help_text="Fotografía del oficial"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
+    role = models.ForeignKey(
+        Role,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='users'
+    )
 
     class Meta:
         app_label = 'users'
@@ -59,28 +96,32 @@ class User(models.Model):
         """Hash and set the password using bcrypt"""
         if raw_password:
             salt = bcrypt.gensalt(rounds=12)
-            self.password_hash = bcrypt.hashpw(raw_password.encode('utf-8'), salt).decode('utf-8')
+            self.password_hash = bcrypt.hashpw(
+                raw_password.encode('utf-8'),
+                salt
+            ).decode('utf-8')
     
     def check_password(self, raw_password):
         """Verify a password against the stored hash"""
         if not self.password_hash or not raw_password:
             return False
-        return bcrypt.checkpw(raw_password.encode('utf-8'), self.password_hash.encode('utf-8'))
+        return bcrypt.checkpw(
+            raw_password.encode('utf-8'),
+            self.password_hash.encode('utf-8')
+        )
+
+
+
 
 
 class SupervisorAssignment(models.Model):
     id = models.AutoField(primary_key=True)
     supervisor = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='supervisor_assignments',
-        limit_choices_to={'status': 'Active'}
+        User,  on_delete=models.CASCADE, 
+        related_name='supervisor_assignments'
     )
-    officer = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='officer_assignments',
-        limit_choices_to={'status': 'Active'}
+    officer = models.ForeignKey(User, 
+        on_delete=models.CASCADE, related_name='officer_assignments'
     )
     start_date = models.DateTimeField(default=timezone.now, db_index=True)
     end_date = models.DateTimeField(null=True, blank=True, db_index=True)
