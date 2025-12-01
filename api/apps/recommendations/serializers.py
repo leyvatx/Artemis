@@ -6,15 +6,18 @@ class RecommendationSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.name', read_only=True)
     user_email = serializers.CharField(source='user.email', read_only=True)
     alert_description = serializers.CharField(source='alert.description', read_only=True)
+    resolved_by_name = serializers.CharField(source='resolved_by.name', read_only=True)
 
     class Meta:
         model = Recommendation
         fields = [
             'recommendation_id', 'user', 'user_name', 'user_email',
             'alert', 'alert_description', 'message', 'category', 'priority',
-            'is_active', 'acknowledged_at', 'created_at', 'updated_at'
+            'status', 'is_active', 'acknowledged_at', 'resolved_at', 
+            'resolved_by', 'resolved_by_name', 'resolution_notes',
+            'created_at', 'updated_at'
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'resolved_at', 'resolved_by']
 
     def validate_message(self, value):
         if len(value.strip()) < 10:

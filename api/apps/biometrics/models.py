@@ -1,6 +1,10 @@
 from django.db import models
 
 
+# Importar modelos ML
+from .ml_models import MLPrediction, MLAlert
+
+
 class BPM(models.Model):
     """Simple BPM sensor readings table.
 
