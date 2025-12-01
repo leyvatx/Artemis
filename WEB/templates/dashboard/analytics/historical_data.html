@@ -1,0 +1,314 @@
+{% extends 'main.html' %}{% load static %}
+{% block title %}Datos Históricos{% endblock %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/analytics.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block content %}
+<div class='analytics-container'>
+
+    <!-- Encabezado -->
+    <section class='analytics-header'>
+        <div>
+            <h2>Datos Históricos</h2>
+            <small>Visualización de datos biométricos históricos de los oficiales</small>
+        </div>
+        <div class='analytics-header-actions'>
+            <a href="{% url 'dashboard:Analytics' %}" class='back-link'>
+                <span class='material-symbols-outlined'>arrow_back</span>
+                Volver
+            </a>
+        </div>
+    </section>
+
+    <!-- Filtro de oficial -->
+    <section class='filter-section'>
+        <form method="get" action="">
+            <label for="officer_id">Seleccionar Oficial</label>
+            <select name="officer_id" id="officer_id" onchange="this.form.submit()">
+                <option value="">-- Seleccione un oficial --</option>
+                {% for officer in officers %}
+                <option value="{{ officer.id }}" {% if officer.id|stringformat:"s" == selected_officer_id %}selected{% endif %}>
+                    {{ officer.name }} {{ officer.last_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </section>
+
+    {% if selected_officer_id %}
+        {% if historical_data %}
+        <!-- Métricas -->
+        <section class='metrics-grid'>
+            <div class='metric-card metric-total'>
+                <div class='metric-label'>Total de Registros</div>
+                <div class='metric-value'>{{ total_records }}</div>
+            </div>
+            <div class='metric-card metric-avg'>
+                <div class='metric-label'>Promedio BPM</div>
+                <div class='metric-value'>{{ avg_bpm }}</div>
+            </div>
+            <div class='metric-card metric-max'>
+                <div class='metric-label'>Máximo BPM</div>
+                <div class='metric-value'>{{ max_bpm }}</div>
+            </div>
+            <div class='metric-card metric-min'>
+                <div class='metric-label'>Mínimo BPM</div>
+                <div class='metric-value'>{{ min_bpm }}</div>
+            </div>
+        </section>
+
+        <!-- Gráfica -->
+        <section class='data-container'>
+            <h3>Gráfica de Frecuencia Cardíaca</h3>
+            <div class='chart-container'>
+                <canvas id="bpmChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Tabla de datos -->
+        <section class='data-container'>
+            <h3>Registros (Página {{ current_page }} de {{ total_pages }})</h3>
+            <div class='data-table-container'>
+                <table class='data-table'>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>BPM</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        {% for data in historical_data %}
+                        <tr>
+                            <td>{{ forloop.counter|add:start_number }}</td>
+                            <td>{{ data.value|default:"N/A" }}</td>
+                            <td>
+                                {% if data.value >= 100 %}
+                                    <span class='status-badge status-high'>Alto</span>
+                                {% elif data.value < 60 %}
+                                    <span class='status-badge status-low'>Bajo</span>
+                                {% else %}
+                                    <span class='status-badge status-normal'>Normal</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación estilo Google -->
+            {% if total_pages > 1 %}
+            <div class='pagination'>
+                <div class='page-links'>
+                    <!-- Botón Primera página -->
+                    {% if current_page > 1 %}
+                        <a href="?officer_id={{ selected_officer_id }}&page=1" class='page-btn' title="Primera página">«</a>
+                        <a href="?officer_id={{ selected_officer_id }}&page={{ current_page|add:'-1' }}" class='page-btn'>‹</a>
+                    {% else %}
+                        <span class='page-btn disabled'>«</span>
+                        <span class='page-btn disabled'>‹</span>
+                    {% endif %}
+                    
+                    <!-- Números de página -->
+                    {% for page_num in page_range %}
+                        {% if page_num == current_page %}
+                            <span class='page-btn page-btn-active'>{{ page_num }}</span>
+                        {% elif page_num == '...' %}
+                            <span class='page-btn page-ellipsis'>...</span>
+                        {% else %}
+                            <a href="?officer_id={{ selected_officer_id }}&page={{ page_num }}" class='page-btn'>{{ page_num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Botón Última página -->
+                    {% if current_page < total_pages %}
+                        <a href="?officer_id={{ selected_officer_id }}&page={{ current_page|add:'1' }}" class='page-btn'>›</a>
+                        <a href="?officer_id={{ selected_officer_id }}&page={{ total_pages }}" class='page-btn' title="Última página">»</a>
+                    {% else %}
+                        <span class='page-btn disabled'>›</span>
+                        <span class='page-btn disabled'>»</span>
+                    {% endif %}
+                </div>
+                <span class='page-info'>Página {{ current_page }} de {{ total_pages }}</span>
+            </div>
+            {% endif %}
+        </section>
+
+        {% else %}
+        <section class='data-container'>
+            <div class='no-data'>
+                <span class='material-symbols-outlined no-data-icon'>search_off</span>
+                <p>No hay datos históricos disponibles para este oficial.</p>
+            </div>
+        </section>
+        {% endif %}
+    {% else %}
+    <section class='data-container'>
+        <div class='no-data'>
+            <span class='material-symbols-outlined no-data-icon'>person_search</span>
+            <p>Seleccione un oficial para ver sus datos históricos.</p>
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    {% if historical_data %}
+    const ctx = document.getElementById('bpmChart').getContext('2d');
+    const officerId = '{{ selected_officer_id }}';
+    const MAX_POINTS = 50;  // Máximo de puntos en la gráfica
+    const UPDATE_INTERVAL = 3000;  // Actualizar cada 3 segundos
+    
+    // Datos iniciales (los más recientes, en orden cronológico)
+    let chartData = {{ chart_data|safe }};
+    let totalRecords = {{ total_records }};
+    let lastKnownId = chartData.length > 0 ? Math.max(...chartData.map(d => d.id)) : 0;
+    
+    // Etiquetas FIJAS del 1 al 50 (nunca cambian)
+    const fixedLabels = Array.from({length: MAX_POINTS}, (_, i) => `${i + 1}`);
+    
+    // Tomar solo los últimos 50 datos
+    const initialData = chartData.slice(-MAX_POINTS).map(d => d.value);
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fixedLabels,
+            datasets: [{
+                label: 'BPM',
+                data: initialData,
+                borderColor: 'rgb(133, 117, 240)',
+                backgroundColor: 'rgba(133, 117, 240, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 3,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            animation: {
+                duration: 300
+            },
+            plugins: {
+                legend: {
+                    display: true
+                },
+                title: {
+                    display: true,
+                    text: 'Frecuencia Cardíaca en Tiempo Real'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 220,
+                    title: {
+                        display: true,
+                        text: 'BPM'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Lecturas'
+                    }
+                }
+            }
+        }
+    });
+
+    // Función para agregar nuevo punto con efecto de ventana deslizante
+    function addDataPoint(newValue, newId) {
+        totalRecords++;
+        
+        // Siempre hacer shift si ya tenemos 50 puntos (etiquetas fijas 1-50)
+        if (chart.data.datasets[0].data.length >= MAX_POINTS) {
+            chart.data.datasets[0].data.shift();  // Quitar el primero
+        }
+        
+        // Agregar el nuevo valor al final
+        chart.data.datasets[0].data.push(newValue);
+        
+        // Actualizar métricas en pantalla
+        updateMetrics(newValue);
+        
+        // Actualizar tabla (agregar fila al inicio)
+        addTableRow(newId, newValue);
+        
+        chart.update('none');
+        
+        lastKnownId = newId;
+    }
+
+    // Actualizar las métricas (total, promedio, max, min)
+    function updateMetrics(newValue) {
+        const allValues = chart.data.datasets[0].data;
+        const avg = (allValues.reduce((a, b) => a + b, 0) / allValues.length).toFixed(1);
+        const max = Math.max(...allValues);
+        const min = Math.min(...allValues.filter(v => v > 0));  // Ignorar 0s
+        
+        // Actualizar contadores en el DOM
+        document.querySelector('.metric-total .metric-value').textContent = totalRecords;
+        document.querySelector('.metric-avg .metric-value').textContent = avg;
+        document.querySelector('.metric-max .metric-value').textContent = max;
+        document.querySelector('.metric-min .metric-value').textContent = min > 0 ? min : 0;
+    }
+
+    // Agregar fila a la tabla (no modificar la tabla paginada, solo la gráfica se actualiza en vivo)
+    // La tabla se mantiene estática porque tiene paginación del servidor
+    function addTableRow(id, value) {
+        // No hacer nada - la tabla está paginada del servidor
+        // Solo la gráfica se actualiza en tiempo real
+    }
+
+    // Polling para nuevos datos
+    async function checkForNewData() {
+        try {
+            // Llamar al endpoint de la API (puerto 8000)
+            const response = await fetch(`http://127.0.0.1:8000/biometrics/bpm/?officer=${officerId}`);
+            if (!response.ok) return;
+            
+            const data = await response.json();
+            
+            // La API devuelve {success: true, data: [...]}
+            const results = data.data || data.results || data || [];
+            
+            // Filtrar solo los nuevos (ID mayor al último conocido)
+            const newRecords = results.filter(r => r.id > lastKnownId);
+            
+            // Ordenar de más antiguo a más nuevo para agregar en orden
+            newRecords.sort((a, b) => a.id - b.id);
+            
+            // Agregar cada nuevo registro
+            newRecords.forEach(record => {
+                addDataPoint(record.value, record.id);
+            });
+            
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Iniciar polling automático
+    setInterval(checkForNewData, UPDATE_INTERVAL);
+    
+    // Ejecutar inmediatamente una vez
+    checkForNewData();
+    
+    // Indicador de actualización en vivo
+    const titleEl = document.querySelector('.data-container h3');
+    if (titleEl && titleEl.textContent.includes('Gráfica')) {
+        titleEl.innerHTML = 'Gráfica de Frecuencia Cardíaca <span style="color: #4CAF50; font-size: 12px;">● EN VIVO</span>';
+    }
+    
+    {% endif %}
+</script>
+{% endblock content %}

@@ -44,4 +44,24 @@ ALERTS_ENDPOINTS = {
     'LIST': f'{BASE_URL}/alerts/',
 }
 
+# Analytics y ML:
+ANALYTICS_ENDPOINTS = {
+    # Historical Data (Biometrics)
+    'HISTORICAL_BPM': f'{BASE_URL}/biometrics/bpm/?officer={{id}}',
+    
+    # Anomaly Detection (ML Alerts)
+    'ANOMALY_DETECTION': f'{BASE_URL}/biometrics/alerts/',
+    'ANOMALY_BY_OFFICER': f'{BASE_URL}/biometrics/alerts/?officer={{id}}',
+    'ALERT_ACKNOWLEDGE': f'{BASE_URL}/biometrics/alerts/{{id}}/acknowledge/',
+    'ALERT_RESOLVE': f'{BASE_URL}/biometrics/alerts/{{id}}/resolve/',
+    
+    # ML Predictions
+    'ML_PREDICTIONS': f'{BASE_URL}/biometrics/predictions/',
+    'PREDICTIONS_BY_OFFICER': f'{BASE_URL}/biometrics/predictions/?officer={{id}}',
+    
+    # Recommendations
+    'RECOMMENDATIONS': f'{BASE_URL}/recommendations/',
+    'RECOMMENDATIONS_BY_OFFICER': f'{BASE_URL}/recommendations/?officer={{id}}',
+}
+
 # ---------------------------------------------------------------------------- #

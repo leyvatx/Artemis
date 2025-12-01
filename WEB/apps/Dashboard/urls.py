@@ -5,7 +5,7 @@ from django.urls import path
 from .views import LoginView, LogoutView, HomeView
 
 # Sección de análisis (URLs)
-# from .analytics.urls import analytics
+from .analytics.urls import analytics
 
 # Sección de geolocalización (URLs)
 from .geolocation.urls import geolocation
@@ -28,6 +28,6 @@ urlpatterns = [
     # Inicio:
     path('', HomeView.as_view(), name='Home'),
 
-] + geolocation + officers + reports
+] + analytics + geolocation + officers + reports
 
 # ---------------------------------------------------------------------------- #

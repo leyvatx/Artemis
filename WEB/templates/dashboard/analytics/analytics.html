@@ -1,0 +1,65 @@
+{% extends 'main.html' %}{% load static %}
+{% block title %}Análisis{% endblock %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/analytics.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block content %}
+<div class='analytics-container'>
+
+    <!-- Encabezado -->
+    <section class='analytics-header'>
+        <div>
+            <h2>Centro de análisis</h2>
+            <small>Análisis avanzado de datos y predicciones con inteligencia artificial</small>
+        </div>
+    </section>
+
+    <!-- Grid de opciones de Analytics -->
+    <section class='analytics-grid'>
+
+        <a href="{% url 'dashboard:HistoricalData' %}" class='analytics-card card-historical'>
+            <div class='analytics-card-header'>
+                <h3>Datos Históricos</h3>
+                <span class='material-symbols-outlined'>monitoring</span>
+            </div>
+            <div class='analytics-card-body'>
+                <p>Visualiza y analiza datos históricos de frecuencia cardíaca y métricas biométricas de los oficiales.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'dashboard:AnomalyDetection' %}" class='analytics-card card-anomaly'>
+            <div class='analytics-card-header'>
+                <h3>Detección de Anomalías</h3>
+                <span class='material-symbols-outlined'>warning</span>
+            </div>
+            <div class='analytics-card-body'>
+                <p>Detección automática de anomalías en los datos biométricos usando algoritmos de Machine Learning.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'dashboard:MLPredictions' %}" class='analytics-card card-predictions'>
+            <div class='analytics-card-header'>
+                <h3>Predicciones ML</h3>
+                <span class='material-symbols-outlined'>psychology</span>
+            </div>
+            <div class='analytics-card-body'>
+                <p>Predicciones generadas por modelos de IA para anticipar situaciones de riesgo.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'dashboard:Recommendations' %}" class='analytics-card card-recommendations'>
+            <div class='analytics-card-header'>
+                <h3>Recomendaciones</h3>
+                <span class='material-symbols-outlined'>lightbulb</span>
+            </div>
+            <div class='analytics-card-body'>
+                <p>Recomendaciones inteligentes basadas en el análisis de datos y patrones detectados.</p>
+            </div>
+        </a>
+
+    </section>
+
+</div>
+{% endblock content %}

@@ -1,0 +1,175 @@
+{% extends 'main.html' %}{% load static %}
+{% block title %}Detección de Anomalías{% endblock %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/analytics.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block content %}
+<div class='analytics-container'>
+
+    <!-- Encabezado -->
+    <section class='analytics-header'>
+        <div>
+            <h2>Detección de Anomalías</h2>
+            <small>Identificación automática de patrones anómalos en datos biométricos</small>
+        </div>
+        <div class='analytics-header-actions'>
+            <a href="{% url 'dashboard:Analytics' %}" class='back-link'>
+                <span class='material-symbols-outlined'>arrow_back</span>
+                Volver
+            </a>
+        </div>
+    </section>
+
+    <!-- Filtro de oficial -->
+    <section class='filter-section'>
+        <form method="get" action="">
+            <label for="officer_id">Filtrar por Oficial</label>
+            <select name="officer_id" id="officer_id" onchange="this.form.submit()">
+                <option value="">-- Todos los oficiales --</option>
+                {% for officer in officers %}
+                <option value="{{ officer.id }}" {% if officer.id|stringformat:"s" == selected_officer_id %}selected{% endif %}>
+                    {{ officer.name }} {{ officer.last_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </section>
+
+    {% if anomalies %}
+    <!-- Métricas -->
+    <section class='metrics-grid'>
+        <div class='metric-card metric-total'>
+            <div class='metric-label'>Total de Alertas</div>
+            <div class='metric-value'>{{ total_alerts }}</div>
+        </div>
+        <div class='metric-card metric-avg'>
+            <div class='metric-label'>Pendientes</div>
+            <div class='metric-value'>{{ pending_count }}</div>
+        </div>
+        <div class='metric-card metric-min'>
+            <div class='metric-label'>Resueltas</div>
+            <div class='metric-value'>{{ resolved_count }}</div>
+        </div>
+    </section>
+
+    <!-- Lista de anomalías -->
+    <section class='items-grid'>
+        {% for anomaly in anomalies %}
+        <div class='item-card severity-{{ anomaly.severity|lower|default:"medium" }} status-{{ anomaly.status|lower }}'>
+            <div class='item-card-header'>
+                <h4 class='item-card-title'>
+                    <span class='material-symbols-outlined'>warning</span>
+                    {{ anomaly.user_name|default:"Oficial" }}
+                </h4>
+                <div class='item-badges'>
+                    <span class='item-badge severity-badge-{{ anomaly.severity|lower }}'>
+                        {% if anomaly.severity == 'CRITICAL' %}Crítica
+                        {% elif anomaly.severity == 'HIGH' %}Alta
+                        {% elif anomaly.severity == 'MEDIUM' %}Media
+                        {% elif anomaly.severity == 'LOW' %}Baja
+                        {% else %}{{ anomaly.severity }}{% endif %}
+                    </span>
+                    <span class='status-pill status-{{ anomaly.status|lower|default:"pending" }}'>
+                        {% if anomaly.status == 'Pending' %}Pendiente
+                        {% elif anomaly.status == 'Acknowledged' %}Reconocida
+                        {% elif anomaly.status == 'Resolved' %}Resuelta
+                        {% elif anomaly.status == 'Dismissed' %}Descartada
+                        {% else %}{{ anomaly.status }}{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class='item-details'>
+                <div class='detail-item'>
+                    <div class='detail-label'>Fecha y Hora</div>
+                    <div class='detail-value'>{{ anomaly.created_at_formatted|default:"N/A" }}</div>
+                </div>
+                <div class='detail-item'>
+                    <div class='detail-label'>Tipo de Alerta</div>
+                    <div class='detail-value'>
+                        {% if anomaly.alert_type == 'HR_CRITICAL_HIGH' %}FC Críticamente Alta
+                        {% elif anomaly.alert_type == 'HR_CRITICAL_LOW' %}FC Críticamente Baja
+                        {% elif anomaly.alert_type == 'HR_ZERO' %}Sin Señal FC
+                        {% elif anomaly.alert_type == 'STRESS_CRITICAL' %}Estrés Crítico
+                        {% elif anomaly.alert_type == 'STRESS_HIGH_RISK' %}Alto Riesgo de Estrés
+                        {% elif anomaly.alert_type == 'HR_ABNORMALLY_HIGH' %}FC Anormalmente Alta
+                        {% elif anomaly.alert_type == 'HR_ABNORMALLY_LOW' %}FC Anormalmente Baja
+                        {% elif anomaly.alert_type == 'STRESS_ELEVATED' %}Estrés Elevado
+                        {% elif anomaly.alert_type == 'HR_SUSTAINED_ELEVATED' %}FC Elevada Sostenida
+                        {% elif anomaly.alert_type == 'HR_RAPID_FLUCTUATION' %}Fluctuaciones Rápidas FC
+                        {% elif anomaly.alert_type == 'ANOMALY_DETECTED' %}Anomalía Detectada
+                        {% elif anomaly.alert_type == 'ML_PREDICTION_ALERT' %}Alerta Predictiva ML
+                        {% else %}{{ anomaly.alert_type }}{% endif %}
+                    </div>
+                </div>
+                <div class='detail-item'>
+                    <div class='detail-label'>Frecuencia Cardíaca</div>
+                    <div class='detail-value'>{{ anomaly.heart_rate|default:"N/A" }} BPM</div>
+                </div>
+                <div class='detail-item'>
+                    <div class='detail-label'>Score de Estrés</div>
+                    <div class='detail-value'>{{ anomaly.stress_score_formatted|default:"N/A" }}%</div>
+                </div>
+            </div>
+
+            <div class='item-description'>
+                <strong>Mensaje:</strong> {{ anomaly.message|default:"Sin descripción" }}
+            </div>
+            
+            <div class='action-items'>
+                <h4>Acción Requerida</h4>
+                <p>{{ anomaly.action_required|default:"Monitorear al oficial" }}</p>
+            </div>
+
+            <!-- Botones de acción -->
+            {% if anomaly.status == 'Pending' %}
+            <div class='alert-actions'>
+                <form method="post" action="{% url 'dashboard:AnomalyAction' anomaly.id 'acknowledge' %}" class='action-form'>
+                    {% csrf_token %}
+                    <button type="submit" class='action-btn btn-acknowledge'>
+                        <span class='material-symbols-outlined'>visibility</span>
+                        Reconocer
+                    </button>
+                </form>
+                <form method="post" action="{% url 'dashboard:AnomalyAction' anomaly.id 'resolve' %}" class='action-form'>
+                    {% csrf_token %}
+                    <button type="submit" class='action-btn btn-resolve'>
+                        <span class='material-symbols-outlined'>check_circle</span>
+                        Resolver
+                    </button>
+                </form>
+            </div>
+            {% elif anomaly.status == 'Acknowledged' %}
+            <div class='alert-actions'>
+                <form method="post" action="{% url 'dashboard:AnomalyAction' anomaly.id 'resolve' %}" class='action-form'>
+                    {% csrf_token %}
+                    <button type="submit" class='action-btn btn-resolve'>
+                        <span class='material-symbols-outlined'>check_circle</span>
+                        Marcar como Resuelto
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class='alert-resolved'>
+                <span class='material-symbols-outlined'>verified</span>
+                Alerta resuelta
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+
+    {% else %}
+    <section class='data-container'>
+        <div class='no-data'>
+            <span class='material-symbols-outlined no-data-icon'>verified</span>
+            <p>No se han detectado anomalías en este momento.</p>
+            <small>El sistema de detección está monitoreando activamente los datos biométricos.</small>
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock content %}
