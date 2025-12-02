@@ -184,3 +184,43 @@ class CleanSupervisorAssignmentSerializer(serializers.ModelSerializer):
             'id', 'supervisor', 'officer', 'start_date', 'end_date', 'notes'
         ]
         read_only_fields = ['id']
+
+
+class AlertDetailSerializer(serializers.Serializer):
+    """Serializer for alerts with detailed officer information"""
+    id = serializers.IntegerField()
+    officer_id = serializers.IntegerField(source='user.id')
+    officer_name = serializers.CharField(source='user.name')
+    officer_email = serializers.CharField(source='user.email')
+    officer_badge = serializers.CharField(source='user.badge_number')
+    officer_rank = serializers.CharField(source='user.rank')
+    alert_type = serializers.CharField(source='type.name')
+    level = serializers.CharField()
+    status = serializers.CharField()
+    description = serializers.CharField()
+    location = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    acknowledged_at = serializers.DateTimeField(allow_null=True)
+    acknowledged_by_name = serializers.CharField(source='acknowledged_by.name', allow_null=True)
+    resolution_notes = serializers.CharField()
+    
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        # Agregar información adicional
+        ret['time_ago'] = self._get_time_ago(instance.created_at)
+        ret['is_critical'] = instance.level in ['High', 'Critical']
+        return ret
+    
+    def _get_time_ago(self, datetime):
+        from django.utils import timezone
+        now = timezone.now()
+        diff = now - datetime
+        
+        if diff.days > 0:
+            return f"Hace {diff.days}d"
+        elif diff.seconds > 3600:
+            return f"Hace {diff.seconds // 3600}h"
+        elif diff.seconds > 60:
+            return f"Hace {diff.seconds // 60}m"
+        else:
+            return "Hace poco"

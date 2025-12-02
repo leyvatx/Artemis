@@ -98,6 +98,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
@@ -149,6 +153,18 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF Configuration for cross-origin requests
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://localhost:8001",
+    "http://127.0.0.1:8001",
+    "http://localhost:8002",
+    "http://127.0.0.1:8002",
+]
 
 # Security Headers
 SECURE_BROWSER_XSS_FILTER = True

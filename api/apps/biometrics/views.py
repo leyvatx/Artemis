@@ -8,7 +8,10 @@ from .serializers import (
     MLAlertDetailSerializer
 )
 from apps.events import EventLogger
+from apps.users.models import SupervisorAssignment
 from .ml_service import get_ml_service
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 import logging
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -21,13 +24,35 @@ class BPMViewSet(BaseViewSet):
     """ViewSet for simple BPM sensor readings."""
     queryset = BPM.objects.all()
     serializer_class = BPMSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Filtrar por officer_id si se proporciona en query params"""
+        """
+        Filtrar por supervisor/officer role y officer_id
+        - Supervisores: ven BPM de sus oficiales asignados
+        - Oficiales: ven solo su propio BPM
+        """
+        user = self.request.user
         queryset = BPM.objects.all().order_by('-created_at')
+        
+        # Si es oficial, solo ve su propio BPM
+        if user.role and user.role.name == 'officer':
+            queryset = queryset.filter(user=user)
+        # Si es supervisor, ve BPM de sus oficiales asignados
+        elif user.role and user.role.name == 'supervisor':
+            assigned_officers = SupervisorAssignment.objects.filter(
+                supervisor=user,
+                end_date__isnull=True
+            ).values_list('officer_id', flat=True)
+            queryset = queryset.filter(user_id__in=assigned_officers)
+        else:
+            queryset = BPM.objects.none()
+        
+        # También filtrar por officer_id si se proporciona en query params
         officer_id = self.request.query_params.get('officer', None)
         if officer_id:
             queryset = queryset.filter(user_id=officer_id)
+        
         return queryset
 
     def create(self, request, *args, **kwargs):

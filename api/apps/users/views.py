@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from core.views import BaseViewSet
 from .models import Role, User, SupervisorAssignment
@@ -8,7 +8,7 @@ from apps.reports.models import Report
 from .serializers import (
     RoleSerializer, UserSerializer, SupervisorAssignmentSerializer, 
     UserDetailSerializer, OfficerSerializer, SupervisorSerializer,
-    CleanSupervisorAssignmentSerializer
+    CleanSupervisorAssignmentSerializer, AlertDetailSerializer
 )
 from apps.alerts.models import Alert, AlertType
 from apps.biometrics.models import BPM
@@ -284,3 +284,240 @@ class SupervisorViewSet(viewsets.ViewSet):
                 'last_7_days': events_last_7_days,
             }
         }, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['get'], url_path='alerts')
+    def get_alerts(self, request, pk=None):
+        """
+        Obtener alertas recientes de todos los oficiales asignados al supervisor.
+        
+        GET /supervisors/{id}/alerts/
+        Query params:
+        - limit: número de alertas a devolver (default: 10)
+        - status: filtrar por estado (Pending, Acknowledged, Resolved, Dismissed)
+        - level: filtrar por nivel (Low, Medium, High, Critical)
+        """
+        try:
+            supervisor = User.objects.get(id=pk)
+        except User.DoesNotExist:
+            return Response(
+                {'success': False, 'error': 'Supervisor not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Obtener oficiales asignados
+        active_officers = SupervisorAssignment.objects.filter(
+            supervisor=supervisor,
+            end_date__isnull=True
+        ).values_list('officer_id', flat=True)
+        
+        # Obtener alertas
+        alerts_queryset = Alert.objects.filter(
+            user_id__in=active_officers
+        ).select_related('user', 'type', 'acknowledged_by').order_by('-created_at')
+        
+        # Filtrar por estado si se proporciona
+        status_filter = request.query_params.get('status', None)
+        if status_filter:
+            alerts_queryset = alerts_queryset.filter(status=status_filter)
+        
+        # Filtrar por nivel si se proporciona
+        level_filter = request.query_params.get('level', None)
+        if level_filter:
+            alerts_queryset = alerts_queryset.filter(level=level_filter)
+        
+        # Limitar resultados
+        limit = int(request.query_params.get('limit', 10))
+        alerts = alerts_queryset[:limit]
+        
+        from .serializers import AlertDetailSerializer
+        serializer = AlertDetailSerializer(alerts, many=True, context={'request': request})
+        
+        return Response({
+            'success': True,
+            'supervisor': {
+                'id': supervisor.id,
+                'name': supervisor.name,
+            },
+            'alerts_count': alerts_queryset.count(),
+            'returned': len(alerts),
+            'alerts': serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def supervisor_alerts_view(request, supervisor_id):
+    """
+    Vista simple para obtener alertas de un supervisor.
+    GET /supervisors/{supervisor_id}/alerts/
+    """
+    try:
+        supervisor = User.objects.get(id=supervisor_id)
+    except User.DoesNotExist:
+        return Response(
+            {'success': False, 'error': 'Supervisor not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Obtener oficiales asignados
+    active_officers = SupervisorAssignment.objects.filter(
+        supervisor=supervisor,
+        end_date__isnull=True
+    ).values_list('officer_id', flat=True)
+    
+    if not active_officers.exists():
+        return Response(
+            {'success': False, 'error': 'No officers assigned'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Obtener alertas
+    alerts_queryset = Alert.objects.filter(
+        user_id__in=active_officers
+    ).select_related('user', 'type', 'acknowledged_by').order_by('-created_at')
+    
+    # Filtrar por estado si se proporciona
+    status_filter = request.query_params.get('status', None)
+    if status_filter:
+        alerts_queryset = alerts_queryset.filter(status=status_filter)
+    
+    # Filtrar por nivel si se proporciona
+    level_filter = request.query_params.get('level', None)
+    if level_filter:
+        alerts_queryset = alerts_queryset.filter(level=level_filter)
+    
+    # Limitar resultados
+    limit = int(request.query_params.get('limit', 10))
+    alerts = alerts_queryset[:limit]
+    
+    serializer = AlertDetailSerializer(alerts, many=True, context={'request': request})
+    
+    return Response({
+        'success': True,
+        'supervisor': {
+            'id': supervisor.id,
+            'name': supervisor.name,
+        },
+        'alerts_count': alerts_queryset.count(),
+        'returned': len(alerts),
+        'alerts': serializer.data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def supervisor_officers_view(request, supervisor_id):
+    """
+    Vista simple para obtener oficiales de un supervisor.
+    GET /supervisors/{supervisor_id}/officers/
+    """
+    try:
+        supervisor = User.objects.get(id=supervisor_id)
+    except User.DoesNotExist:
+        return Response(
+            {'success': False, 'error': 'Supervisor not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Obtener todas las asignaciones activas del supervisor
+    active_assignments = SupervisorAssignment.objects.filter(
+        supervisor=supervisor,
+        end_date__isnull=True
+    ).select_related('officer')
+    
+    officers = [assignment.officer for assignment in active_assignments]
+    serializer = OfficerSerializer(officers, many=True, context={'request': request})
+    
+    return Response({
+        'success': True,
+        'supervisor': {
+            'id': supervisor.id,
+            'name': supervisor.name,
+            'email': supervisor.email,
+            'badge_number': supervisor.badge_number,
+            'rank': supervisor.rank,
+        },
+        'officers_count': len(officers),
+        'officers': serializer.data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def supervisor_statistics_view(request, supervisor_id):
+    """
+    Vista simple para obtener estadísticas de un supervisor.
+    GET /supervisors/{supervisor_id}/statistics/
+    """
+    try:
+        supervisor = User.objects.get(id=supervisor_id)
+    except User.DoesNotExist:
+        return Response(
+            {'success': False, 'error': 'Supervisor not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    now = timezone.now()
+    last_7_days = now - timedelta(days=7)
+    
+    # Oficiales bajo supervisión
+    active_officers = SupervisorAssignment.objects.filter(
+        supervisor=supervisor,
+        end_date__isnull=True
+    ).select_related('officer')
+    officer_ids = [a.officer.id for a in active_officers]
+    officers_count = len(officer_ids)
+    
+    # Alertas de sus oficiales
+    total_alerts = Alert.objects.filter(user_id__in=officer_ids).count()
+    pending_alerts = Alert.objects.filter(user_id__in=officer_ids, status='Pending').count()
+    critical_alerts = Alert.objects.filter(user_id__in=officer_ids, level='Critical').count()
+    alerts_last_7_days = Alert.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
+    
+    # Biometría de sus oficiales
+    biometric_records = BPM.objects.filter(user_id__in=officer_ids).count()
+    biometric_last_7_days = BPM.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
+    
+    # Ubicaciones de sus oficiales
+    location_records = GeoLocation.objects.filter(user_id__in=officer_ids).count()
+    location_last_7_days = GeoLocation.objects.filter(user_id__in=officer_ids, created_at__gte=last_7_days).count()
+    
+    # Eventos de sus oficiales
+    events = Report.objects.count()
+    events_last_7_days = Report.objects.filter(created_at__gte=last_7_days).count()
+
+    # Estados de los oficiales
+    active_officers_count = User.objects.filter(id__in=officer_ids, status='Active').count()
+    inactive_officers_count = User.objects.filter(id__in=officer_ids, status='Inactive').count()
+    
+    return Response({
+        'success': True,
+        'supervisor': {
+            'id': supervisor.id,
+            'name': supervisor.name,
+            'email': supervisor.email,
+            'badge_number': supervisor.badge_number,
+            'rank': supervisor.rank,
+        },
+        'timestamp': now.isoformat(),
+        'officers': {
+            'total': officers_count,
+            'active': active_officers_count,
+            'inactive': inactive_officers_count,
+        },
+        'alerts': {
+            'total': total_alerts,
+            'pending': pending_alerts,
+            'critical': critical_alerts,
+            'last_7_days': alerts_last_7_days,
+        },
+        'biometrics': {
+            'total_records': biometric_records,
+            'last_7_days': biometric_last_7_days,
+        },
+        'locations': {
+            'total_records': location_records,
+            'last_7_days': location_last_7_days,
+        },
+        'reports': {
+            'total': events,
+            'last_7_days': events_last_7_days,
+        }
+    }, status=status.HTTP_200_OK)

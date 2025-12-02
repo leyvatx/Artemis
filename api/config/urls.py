@@ -32,27 +32,27 @@ def api_root(request):
     })
 
 urlpatterns = [
-    path('', api_root),
+    path('api/', api_root),
     
     # API Documentation (Swagger/OpenAPI)
-    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
     # Authentication
-    path('auth/', include('apps.users.auth_urls')),
+    path('api/auth/', include('apps.users.auth_urls')),
     
     # API Endpoints
-    path('roles/', include('apps.users.role_urls')),
-    path('users/', include('apps.users.urls')),
-    path('supervisors/', include('apps.users.supervisor_urls')),
-    path('biometrics/', include('apps.biometrics.urls')),
-    path('geolocation/', include('apps.geolocation.urls')),
-    path('alert-types/', include('apps.alerts.type_urls')),
-    path('alerts/', include('apps.alerts.urls')),
-    path('events/', include('apps.events.urls')),
-    path('recommendations/', include('apps.recommendations.urls')),
-    path('reports/', include('apps.reports.urls')),
+    path('api/roles/', include('apps.users.role_urls')),
+    path('api/users/', include('apps.users.urls')),
+    path('api/supervisors/', include('apps.users.supervisor_urls')),
+    path('api/biometrics/', include('apps.biometrics.urls')),
+    path('api/geolocation/', include('apps.geolocation.urls')),
+    path('api/alert-types/', include('apps.alerts.type_urls')),
+    path('api/alerts/', include('apps.alerts.urls')),
+    path('api/events/', include('apps.events.urls')),
+    path('api/recommendations/', include('apps.recommendations.urls')),
+    path('api/reports/', include('apps.reports.urls')),
 ]
 
 if settings.DEBUG:
