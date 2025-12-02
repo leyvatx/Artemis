@@ -152,6 +152,9 @@ LOGIN_URL = '/artemis/login/'
 LOGIN_REDIRECT_URL = '/artemis/'
 LOGOUT_REDIRECT_URL = '/artemis/login/'
 
+# API Base URL
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000/api')
+
 # ---------------------------------------------------------------------------- #
 
 # SESSION_COOKIE_HTTPONLY = True

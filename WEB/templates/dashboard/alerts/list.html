@@ -1,0 +1,172 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block title %}Alertas{% endblock %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/alerts.css" %}' rel='stylesheet' />
+{% endblock %}
+
+{% block content %}
+
+<div class='alerts-page'>
+    
+    <!-- Header de la página -->
+    <div class='page-header'>
+        <div class='header-content'>
+            <h1>Alertas de Oficiales</h1>
+            <p class='header-subtitle'>Gestiona todas las alertas de tus oficiales asignados</p>
+        </div>
+        <div class='header-stats'>
+            <div class='stat-card'>
+                <span class='stat-label'>Total de Alertas</span>
+                <span class='stat-value'>{{ alerts_count }}</span>
+            </div>
+            <div class='stat-card critical'>
+                <span class='stat-label'>Críticas</span>
+                <span class='stat-value' id='critical-count'>0</span>
+            </div>
+            <div class='stat-card high'>
+                <span class='stat-label'>Altas</span>
+                <span class='stat-value' id='high-count'>0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class='alerts-filters'>
+        <input type='text' id='search-input' placeholder='Buscar por nombre de oficial...' class='filter-input'>
+        
+        <select id='level-filter' class='filter-select'>
+            <option value=''>Todos los niveles</option>
+            <option value='Critical'>Críticas</option>
+            <option value='High'>Altas</option>
+            <option value='Medium'>Medias</option>
+            <option value='Low'>Bajas</option>
+        </select>
+
+        <select id='status-filter' class='filter-select'>
+            <option value=''>Todos los estados</option>
+            <option value='Pending'>Pendientes</option>
+            <option value='Acknowledged'>Reconocidas</option>
+            <option value='Resolved'>Resueltas</option>
+            <option value='Dismissed'>Descartadas</option>
+        </select>
+    </div>
+
+    <!-- Lista de alertas -->
+    <div class='alerts-container'>
+        {% if error %}
+            <div class='error-message'>
+                <span class='material-symbols-outlined'>error</span>
+                <p>{{ error }}</p>
+            </div>
+        {% elif alerts %}
+            <table class='alerts-table'>
+                <thead>
+                    <tr>
+                        <th>Oficial</th>
+                        <th>Placa</th>
+                        <th>Tipo de Alerta</th>
+                        <th>Nivel</th>
+                        <th>Estado</th>
+                        <th>Descripción</th>
+                        <th>Ubicación</th>
+                        <th>Hora</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id='alerts-tbody'>
+                    {% for alert in alerts %}
+                    <tr class='alert-row alert-{{ alert.level|lower }}' data-level='{{ alert.level }}' data-status='{{ alert.status }}' data-officer='{{ alert.officer_name }}'>
+                        <td class='officer-cell'>
+                            <strong>{{ alert.officer_name }}</strong>
+                            <small>{{ alert.officer_rank }}</small>
+                        </td>
+                        <td>{{ alert.officer_badge }}</td>
+                        <td class='alert-type-cell'>{{ alert.alert_type }}</td>
+                        <td class='alert-level-cell'>
+                            <span class='badge badge-{{ alert.level|lower }}'>{{ alert.level }}</span>
+                        </td>
+                        <td class='alert-status-cell'>
+                            <span class='badge badge-status-{{ alert.status|lower }}'>{{ alert.status }}</span>
+                        </td>
+                        <td class='description-cell'>{{ alert.description|truncatewords:10 }}</td>
+                        <td class='location-cell'>
+                            {% if alert.location %}
+                                {{ alert.location }}
+                            {% else %}
+                                <em>No disponible</em>
+                            {% endif %}
+                        </td>
+                        <td class='time-cell'>
+                            <span title='{{ alert.created_at }}'>{{ alert.time_ago }}</span>
+                        </td>
+                        <td class='actions-cell'>
+                            <a href='{% url "dashboard:OfficerDetail" alert.officer_id %}' class='btn-action btn-view' title='Ver detalle del oficial'>
+                                <span class='material-symbols-outlined'>visibility</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class='empty-state'>
+                <span class='material-symbols-outlined'>check_circle</span>
+                <h3>Sin alertas</h3>
+                <p>Todos tus oficiales están en condiciones normales</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('search-input').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterAlerts();
+    });
+    document.getElementById('level-filter').addEventListener('change', filterAlerts);
+    document.getElementById('status-filter').addEventListener('change', filterAlerts);
+
+    function filterAlerts() {
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        const levelFilter = document.getElementById('level-filter').value;
+        const statusFilter = document.getElementById('status-filter').value;
+        const rows = document.querySelectorAll('.alert-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            let visible = true;
+            const officerName = row.dataset.officer.toLowerCase();
+            if (searchTerm && !officerName.includes(searchTerm)) {
+                visible = false;
+            }
+            if (levelFilter && row.dataset.level !== levelFilter) {
+                visible = false;
+            }
+            if (statusFilter && row.dataset.status !== statusFilter) {
+                visible = false;
+            }
+
+            row.style.display = visible ? '' : 'none';
+            if (visible) visibleCount++;
+        });
+        updateCounters();
+    }
+
+    function updateCounters() {
+        const rows = document.querySelectorAll('.alert-row:not([style*="display: none"])');
+        const criticalCount = Array.from(rows).filter(r => r.dataset.level === 'Critical').length;
+        const highCount = Array.from(rows).filter(r => r.dataset.level === 'High').length;
+
+        document.getElementById('critical-count').textContent = criticalCount;
+        document.getElementById('high-count').textContent = highCount;
+    }
+
+    // Inicializar contadores
+    updateCounters();
+</script>
+
+{% endblock %}

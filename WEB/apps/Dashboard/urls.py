@@ -7,6 +7,9 @@ from .views import LoginView, LogoutView, HomeView
 # Sección de análisis (URLs)
 from .analytics.urls import analytics
 
+# Sección de alertas (URLs)
+from .alerts.urls import alerts
+
 # Sección de geolocalización (URLs)
 from .geolocation.urls import geolocation
 
@@ -28,6 +31,6 @@ urlpatterns = [
     # Inicio:
     path('', HomeView.as_view(), name='Home'),
 
-] + analytics + geolocation + officers + reports
+] + analytics + alerts + geolocation + officers + reports
 
 # ---------------------------------------------------------------------------- #

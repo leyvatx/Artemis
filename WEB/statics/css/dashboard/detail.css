@@ -204,6 +204,109 @@
     color: var(--canvas-color);
 }
 
+#officer-alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.alert-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid;
+    transition: all 0.2s ease;
+}
+
+.alert-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(4px);
+}
+
+.alert-card.alert-critical {
+    border-left-color: var(--error-text);
+    background-color: var(--error-background);
+}
+
+.alert-card.alert-high {
+    border-left-color: var(--warning-text);
+    background-color: var(--warning-background);
+}
+
+.alert-card.alert-medium {
+    border-left-color: #4A90E2;
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.alert-card.alert-low {
+    border-left-color: var(--success-text);
+    background-color: var(--success-background);
+}
+
+.alert-card-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.alert-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: white;
+}
+
+.alert-card.alert-critical .alert-badge {
+    background-color: var(--error-text);
+}
+
+.alert-card.alert-high .alert-badge {
+    background-color: var(--warning-text);
+}
+
+.alert-card.alert-medium .alert-badge {
+    background-color: #4A90E2;
+}
+
+.alert-card.alert-low .alert-badge {
+    background-color: var(--success-text);
+}
+
+.alert-type {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.alert-status {
+    margin-left: auto;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    background-color: var(--canvas-color);
+    color: var(--text-secondary);
+}
+
+.alert-card-body {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.alert-card-body p {
+    margin: 0.5rem 0;
+}
+
+.alert-card-body strong {
+    color: var(--text-primary);
+}
+
+.alert-card-body small {
+    color: var(--text-disabled);
+    display: block;
+    margin-top: 0.5rem;
+}
+
 /* -------------------------------------------------------------------------- */
 
 @media (max-width: 768px) {

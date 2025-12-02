@@ -2,8 +2,9 @@
 # -- ENDPOINTS --------------------------------------------------------------- #
 
 import os
+from django.conf import settings
 
-BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000')
+BASE_URL = getattr(settings, 'API_BASE_URL', os.getenv('API_BASE_URL', 'http://127.0.0.1:8000/api'))
 
 # Autenticación:
 AUTH_ENDPOINTS = {

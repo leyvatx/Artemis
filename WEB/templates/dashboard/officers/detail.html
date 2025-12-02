@@ -18,19 +18,19 @@
         <!-- Información general -->
         <section class='officer-info'>
             <div class='info-left'>
-                <img class='officer-picture' src='{{ officer.picture }}' alt='Foto del oficial: {{ officer.name }}'>
+                <img class='officer-picture' src='{{ officer.picture|default:"" }}' alt='Foto del oficial: {{ officer.name }}'>
             </div>
 
             <div class='info-right'>
-                <h1 class='officer-name'>{{ officer.name }}</h1>
-                <span class='officer-rank'>{{ officer.rank|capfirst }}</span>
+                <h1 class='officer-name'>{{ officer.name|default:"Sin nombre" }}</h1>
+                <span class='officer-rank'>{{ officer.rank|capfirst|default:"Sin rango" }}</span>
 
-                <div class='officer-status {{ officer.status|lower }}'>
-                    {{ officer.status_label }}
+                <div class='officer-status {{ officer.status|lower|default:"unknown" }}'>
+                    {{ officer.status_label|default:"Desconocido" }}
                 </div>
 
                 <div class='officer-badge'>
-                    <strong>Placa:</strong> {{ officer.badge_number }}
+                    <strong>Placa:</strong> {{ officer.badge_number|default:"N/A" }}
                 </div>
             </div>
         </section>
@@ -76,13 +76,82 @@
         <!-- Alertas -->
         <section class='alerts-section'>
             <h2>Alertas</h2>
-            <div class='placeholder'>No se han generado alertas recientes.</div>
+            <div id='officer-alerts-container'>
+                <div class='placeholder'>Cargando alertas...</div>
+            </div>
         </section>
     </div>
 </div>
 
 
 <script>
+    // Cargar alertas del oficial
+    async function loadOfficerAlerts() {
+        const officerId = {{ officer.id }};
+        const apiBaseUrl = document.body.getAttribute('data-api-url') || 'http://127.0.0.1:8000/api';
+        
+        try {
+            const response = await fetch(`${apiBaseUrl}/alerts/?user=${officerId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) throw new Error('Error al cargar alertas');
+
+            const data = await response.json();
+            const container = document.getElementById('officer-alerts-container');
+
+            if (data.results && data.results.length > 0) {
+                container.innerHTML = '';
+                data.results.forEach(alert => {
+                    const alertElement = document.createElement('div');
+                    alertElement.className = `alert-card alert-${alert.level.toLowerCase()}`;
+                    alertElement.innerHTML = `
+                        <div class='alert-card-header'>
+                            <span class='alert-badge'>${alert.level}</span>
+                            <span class='alert-type'>${alert.alert_type_name}</span>
+                            <span class='alert-status'>${alert.status}</span>
+                        </div>
+                        <div class='alert-card-body'>
+                            <p><strong>${alert.description}</strong></p>
+                            ${alert.location ? `<p><small>Ubicación: ${alert.location}</small></p>` : ''}
+                            <p><small>Creada: ${new Date(alert.created_at).toLocaleString('es-MX')}</small></p>
+                        </div>
+                    `;
+                    container.appendChild(alertElement);
+                });
+            } else {
+                container.innerHTML = '<div class="placeholder">No se han generado alertas recientes.</div>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            const container = document.getElementById('officer-alerts-container');
+            container.innerHTML = '<div class="placeholder error">Error al cargar las alertas</div>';
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Cargar alertas cuando se carga la página
+    document.addEventListener('DOMContentLoaded', loadOfficerAlerts);
+
     // Configuración de tiempo.
     const INTERVAL_MS = 3000;
     const WINDOW_POINTS = 20;
@@ -132,6 +201,9 @@
 
     // Gráfico BPM:
     const bpmChart = Highcharts.chart('bpmChart', {
+        accessibility: {
+            enabled: false
+        },
         chart: {
             type: 'column', backgroundColor: 'transparent',
             height: 420, marginBottom: 50, animation: true,
@@ -214,6 +286,9 @@
 
     // Gráfico de estrés:
     const stressChart = Highcharts.chart('stressChart', {
+        accessibility: {
+            enabled: false
+        },
         chart: {
             type: 'gauge', backgroundColor: 'transparent',
             height: '90%', animation: { duration: 300 },

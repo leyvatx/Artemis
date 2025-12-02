@@ -1,0 +1,405 @@
+/* -- Estilos para la página de alertas ---------------------------------- */
+
+.alerts-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Header */
+.page-header {
+    background: var(--canvas-color);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.header-content h1 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.header-subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.header-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: var(--background-color);
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    border-left: 4px solid var(--state-idle);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+}
+
+.stat-card.critical {
+    border-left-color: var(--error-text);
+}
+
+.stat-card.high {
+    border-left-color: var(--warning-text);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.stat-card.critical .stat-value {
+    color: var(--error-text);
+}
+
+.stat-card.high .stat-value {
+    color: var(--warning-text);
+}
+
+/* Filtros */
+.alerts-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--canvas-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.filter-input,
+.filter-select {
+    padding: 0.75rem 1rem;
+    border: 0.0125rem solid var(--border-color);
+    border-radius: 0.25rem;
+    background: var(--background-color);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    min-width: 200px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: var(--state-hover);
+    box-shadow: 0 0 0 2px rgba(88, 131, 146, 0.1);
+}
+
+/* Contenedor de alertas */
+.alerts-container {
+    background: var(--canvas-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+/* Tabla de alertas */
+.alerts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.alerts-table thead {
+    background: var(--background-color);
+    border-bottom: 0.0125rem solid var(--border-color);
+}
+
+.alerts-table th {
+    padding: 1rem;
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.alerts-table tbody tr {
+    border-bottom: 0.0125rem solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.alerts-table tbody tr:hover {
+    background-color: rgba(88, 131, 146, 0.05);
+}
+
+.alerts-table td {
+    padding: 1rem;
+    color: var(--text-primary);
+}
+
+/* Estilos por nivel de alerta */
+.alert-row.alert-critical {
+    border-left: 3px solid var(--error-text);
+}
+
+.alert-row.alert-high {
+    border-left: 3px solid var(--warning-text);
+}
+
+.alert-row.alert-medium {
+    border-left: 3px solid #4A90E2;
+}
+
+.alert-row.alert-low {
+    border-left: 3px solid var(--success-text);
+}
+
+/* Celdas específicas */
+.officer-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.officer-cell strong {
+    color: var(--text-primary);
+}
+
+.officer-cell small {
+    color: var(--text-disabled);
+    font-size: 0.8rem;
+}
+
+.alert-type-cell {
+    font-weight: 600;
+    color: var(--state-hover);
+}
+
+.description-cell {
+    max-width: 300px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.location-cell {
+    font-size: 0.9rem;
+}
+
+.location-cell em {
+    color: var(--text-disabled);
+}
+
+.time-cell {
+    font-size: 0.9rem;
+    color: var(--text-disabled);
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.badge-critical {
+    background-color: var(--error-background);
+    color: var(--error-text);
+    border: 0.0125rem solid var(--error-border);
+}
+
+.badge-high {
+    background-color: var(--warning-background);
+    color: var(--warning-text);
+    border: 0.0125rem solid var(--warning-border);
+}
+
+.badge-medium {
+    background-color: rgba(74, 144, 226, 0.2);
+    color: #4A90E2;
+    border: 0.0125rem solid #4A90E2;
+}
+
+.badge-low {
+    background-color: var(--success-background);
+    color: var(--success-text);
+    border: 0.0125rem solid var(--success-border);
+}
+
+/* Badges de estado */
+.badge-status-pending {
+    background-color: var(--info-background);
+    color: var(--info-text);
+    border: 0.0125rem solid var(--info-border);
+}
+
+.badge-status-acknowledged {
+    background-color: rgba(237, 166, 50, 0.2);
+    color: var(--warning-text);
+    border: 0.0125rem solid var(--warning-border);
+}
+
+.badge-status-resolved {
+    background-color: var(--success-background);
+    color: var(--success-text);
+    border: 0.0125rem solid var(--success-border);
+}
+
+.badge-status-dismissed {
+    background-color: rgba(192, 192, 192, 0.2);
+    color: var(--text-disabled);
+    border: 0.0125rem solid var(--border-color);
+}
+
+/* Celdas de acciones */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
+    background: var(--state-idle);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-action:hover {
+    background: var(--state-hover);
+    transform: scale(1.1);
+}
+
+.btn-view span {
+    font-size: 1.2rem;
+}
+
+/* Estado vacío */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-state span {
+    font-size: 4rem;
+    color: var(--state-idle);
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.empty-state p {
+    margin: 0.5rem 0 0 0;
+    color: var(--text-secondary);
+}
+
+/* Mensaje de error */
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--error-background);
+    border-left: 4px solid var(--error-text);
+    border-radius: 0.25rem;
+    color: var(--error-text);
+}
+
+.error-message span {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.error-message p {
+    margin: 0;
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    .alerts-table {
+        font-size: 0.85rem;
+    }
+
+    .alerts-table th,
+    .alerts-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .description-cell {
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-stats {
+        width: 100%;
+    }
+
+    .alerts-filters {
+        flex-direction: column;
+    }
+
+    .filter-input,
+    .filter-select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .alerts-table {
+        font-size: 0.8rem;
+    }
+
+    .alerts-table th,
+    .alerts-table td {
+        padding: 0.5rem;
+    }
+
+    .description-cell {
+        display: none;
+    }
+
+    .location-cell {
+        display: none;
+    }
+
+    .btn-action {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+}
+
+/* -------------------------------------------------------------------------- */

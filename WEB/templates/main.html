@@ -32,7 +32,7 @@
 
 <!-- ----------------------------------------------------------------------- -->
 
-<body>
+<body data-supervisor-id="{{ auth_user.id }}" data-api-url="{{ api_base_url }}">
 
     <aside class='main-sidebar-container'>
         <div class='main-sidebar'>
@@ -53,6 +53,11 @@
                 <a href='{% url "dashboard:OfficersList" %}' class='main-sidebar-button'>
                     <span class='material-symbols-outlined'>local_police</span>
                     <p>Oficiales</p>
+                </a>
+
+                <a href='{% url "dashboard:AlertsList" %}' class='main-sidebar-button'>
+                    <span class='material-symbols-outlined'>notifications_active</span>
+                    <p>Alertas</p>
                 </a>
 
                 <a href='{% url "dashboard:Geolocation" %}' class='main-sidebar-button'>
@@ -103,19 +108,16 @@
                     <span class='material-symbols-outlined main-header-notifications-icon' id='toggle-notifications'>
                         notifications
                     </span>
+                    <span class='notification-badge' id='notification-badge'></span>
 
                     <div class='dropdown-menu' id='notifications-menu'>
-                        <h4>Notificaciones recientes</h4>
+                        <h4>Alertas de Oficiales</h4>
 
-                        <ul>
-                            {% for notification in notifications %}
-                            <li>{{ notification.text }}</li>
-                            {% empty %}
-                            <li>Sin notificaciones.</li>
-                            {% endfor %}
+                        <ul id='alerts-list'>
+                            <li class='loading'>Cargando alertas...</li>
                         </ul>
 
-                        <a href='#' class='dropdown-footer'>Ver todas</a>
+                        <a href='{% url "dashboard:AlertsList" %}' class='dropdown-footer'>Ver todas las alertas</a>
                     </div>
                 </div>
 
