@@ -10,10 +10,11 @@ class ReportSerializer(serializers.ModelSerializer):
         fields = [
             'report_id',
             'report_type', 'title', 'content', 'summary', 'status',
+            'officer', 'supervisor', 'officer_summary', 'supervisor_summary',
             'created_at', 'updated_at', 'generated_at', 'sent_at',
-            'officer_summary', 'supervisor_summary'
         ]
-        read_only_fields = ['created_at', 'updated_at', 'generated_at', 'sent_at']
+
+        read_only_fields = ['created_at', 'updated_at', 'generated_at', 'sent_at', 'report_id']
 
     def get_officer_summary(self, obj):
         officer = obj.officer

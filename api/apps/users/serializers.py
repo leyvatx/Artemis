@@ -165,10 +165,8 @@ class SupervisorAssignmentSerializer(serializers.ModelSerializer):
         if supervisor == officer:
             raise serializers.ValidationError("Supervisor and officer cannot be the same person.")
 
-        # Check if supervisor status is Active
         if supervisor.status != 'Active':
             raise serializers.ValidationError({"supervisor": "Supervisor must have Active status."})
-
 
         return data
 

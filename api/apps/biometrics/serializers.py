@@ -5,12 +5,12 @@ from .ml_models import MLPrediction, MLAlert
 
 
 class BPMSerializer(serializers.ModelSerializer):
-    # Expose only user_id (writeable/readable) instead of nested user object
     user_id = serializers.IntegerField(write_only=False, required=True)
+    created_at = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = BPM
-        fields = ['id', 'user_id', 'value']
+        fields = ['id', 'user_id', 'value', 'created_at']
 
     def validate_value(self, value):
         if value is None:
