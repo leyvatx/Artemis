@@ -13,8 +13,8 @@
 
 # ---------------------------------------------------------------------------- #
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-d1hes9vk7l4+x+@tr6m@+!u=pv3oe#ju1j=bc*_8^f!##8az@!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # ---------------------------------------------------------------------------- #
 
@@ -138,7 +138,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images): https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = "/srv/artemis-web/static/"
 STATICFILES_DIRS = [ BASE_DIR / 'statics' ]
 
 # ---------------------------------------------------------------------------- #
@@ -158,9 +158,8 @@ API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000/api')
 
 # ---------------------------------------------------------------------------- #
 
-# SESSION_COOKIE_HTTPONLY = True
-# CSRF_COOKIE_HTTPONLY = True
-
-# SECURE_CONTENT_TYPE_NOSNIFF = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ---------------------------------------------------------------------------- #

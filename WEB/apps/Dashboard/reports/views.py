@@ -7,6 +7,16 @@ from django.views import generic
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
+from io import BytesIO
+from pathlib import Path
+from reportlab.lib import colors
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
+)
+
 from apps.Dashboard.mixins import LoginRequiredMixin
 from apps.Dashboard.endpoints import REPORTS_ENDPOINTS
 from apps.Dashboard.officers.views import fetch_officers
@@ -173,11 +183,257 @@ class ReportDetailView(LoginRequiredMixin, generic.View):
         return render(request, self.template_name, context)
 
 # Descarga en PDF del reporte:
-class ReportDownloadView(LoginRequiredMixin, generic.View):
-    def get(self, request, pk, *args, **kwargs):
-        # TODO: ...
-        messages.info(request, 'La descarga de PDF aún no está implementada.')
-        return redirect('dashboard:ReportDetail', pk=pk)
+def ReportsDownload(request, report_id):
+    
+    # Datos a mostrar:
+    response = manage_report(request, report_id)
+    report = response.get('data', response)
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter,
+        leftMargin=0, rightMargin=0, topMargin=0, bottomMargin=0)
+
+
+    # Estilos: 
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='BrandTitle', fontSize=14, leading=20,
+        textColor=colors.HexColor("#242D2D"), fontName='Times-Bold'))
+
+    styles.add(ParagraphStyle(name='BrandSubtitle', fontSize=8, leading=10,
+        textColor=colors.HexColor("#445D5D"), fontName='Times-Roman'))
+    
+    styles.add(ParagraphStyle(name='SectionTitle', fontSize=10, leading=14,
+        alignment=2, textColor=colors.HexColor("#242D2D"), fontName='Times-Bold'))
+    
+    styles.add(ParagraphStyle(name='Meta', fontSize=10, leading=12,
+        alignment=2, textColor=colors.HexColor("#445D5D"), fontName='Times-Roman'))
+    
+    styles.add(ParagraphStyle(name='Label', fontSize=10, leading=12,
+        textColor=colors.HexColor("#445D5D"), fontName='Times-Roman'))
+    
+    styles.add(ParagraphStyle(name='Value', fontSize=10, leading=12,
+        textColor=colors.HexColor("#242D2D"), fontName='Times-Roman'))
+    
+    styles.add(ParagraphStyle(name='Justified', fontSize=10, leading=14,
+        textColor=colors.HexColor("#242D2D"), fontName='Times-Roman', alignment=4))
+
+    artemisLogo = Path(__file__).resolve().parent.parent.parent.parent / 'statics' / 'images' / 'mainicon.webp'
+
+
+    # Organización del documento: 
+    elements = []
+    elements.append(Spacer(1, 30))
+
+
+    # Encabezado:
+    mainHeader = []
+
+    if artemisLogo.exists(): # Logotipo (con el nombre).
+        mainHeader.append(Image(str(artemisLogo), width=48, height=48))
+    else: # Añade un espaciado de encontrar el logotipo.
+        mainHeader.append(Spacer(1, 0))
+
+    mainHeader.append(Paragraph('ARTEMIS', styles['BrandTitle']))
+    mainHeader.append(Paragraph('Generación de reportes', styles['BrandSubtitle']))
+
+    created_at = report.get('created_at')
+    createdSTR = created_at.strftime("%d/%m/%Y %H:%M") if hasattr(created_at, "strftime") else str(created_at or "")
+
+    headerTable = Table([
+        [
+            Table([[mainHeader[0], Table([[mainHeader[1]], [mainHeader[2]]],
+                colWidths=[200], style=TableStyle([
+                    ("LEFTPADDING", (0,0), (-1,-1), 6),
+                    ("TOPPADDING", (0,0), (-1,-1), 0),
+                    ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+            ]))]], colWidths=[56, 224],
+            
+            style=TableStyle([
+                ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
+                ("LEFTPADDING", (0,0), (-1,-1), 0),
+                ("RIGHTPADDING", (0,0), (-1,-1), 0),
+                ("TOPPADDING", (0,0), (-1,-1), 0),
+                ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+            ])),
+
+            Table([
+                [Paragraph(f"{str(report.get('title') or 'Reporte')}", styles['SectionTitle'])],
+                [Paragraph(f"Creado el {createdSTR}", styles['Meta'])]
+            ], colWidths=[220], hAlign='RIGHT',
+
+            style=TableStyle([
+               ("LEFTPADDING", (0,0), (-1,-1), 0),
+               ("TOPPADDING", (0,0), (-1,-1), 0),
+               ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+           ])),
+        ]
+    ], colWidths=[320, 220])
+
+    # Borde separador. 
+    headerTable.setStyle(TableStyle([
+        ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
+        ("LINEBELOW", (0,0), (-1,0), 0.25, colors.HexColor("#D7E0DF")),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 10),
+        ("LEFTPADDING", (0,0), (-1,-1), 0),
+        ("RIGHTPADDING", (0,0), (-1,-1), 0),
+    ]))
+
+    elements.append(headerTable)
+    elements.append(Spacer(1, 30))
+
+    # status del reporte:
+    status = str(report.get("status") or "")
+
+    statusBG = {
+        "Borrador": colors.HexColor("#D7E0DF"),
+        "Archivado": colors.HexColor("#F5D58A"),
+        "Generado": colors.HexColor("#A0BD9E"),
+    }.get(status, colors.HexColor("#C5CACB"))
+
+    statusText = {
+        "Borrador": colors.HexColor("#97B1AF"),
+        "Archivado": colors.HexColor("#EDA632"),
+        "Generado": colors.HexColor("#61885F"),
+    }.get(status, colors.HexColor("#445D5D"))
+    
+    statusTable = Table([
+        [
+            Paragraph('Estado', styles['Label']),
+            Table([[
+                Paragraph(f'<b>{status}</b>', ParagraphStyle(
+                    name='StatusValue', parent=styles['Value'],
+                    textColor=statusText, alignment=1
+                ))
+            ]], colWidths=[80], style=TableStyle([
+                ("BACKGROUND", (0,0), (0,0), statusBG),
+                ("BOX", (0,0), (0,0), 0.25, statusText),
+                ("INNERPADDING", (0,0), (0,0), 2),
+                ("VALIGN", (0,0), (0,0), "MIDDLE"),
+            ]))
+        ]
+    ], colWidths=[78, 100], hAlign='LEFT')
+
+    statusTable.setStyle(TableStyle([
+        ("LEFTPADDING", (0,0), (-1,-1), 50),
+        ("RIGHTPADDING", (0,0), (-1,-1), 0),
+        ("TOPPADDING", (0,0), (-1,-1), 0),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+        ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
+    ]))
+
+    elements.append(statusTable)
+    elements.append(Spacer(1, 18))
+
+
+    # Datos del supervisor y del oficial:
+    supervisor = report.get('supervisor_summary', {}) or {}
+    officer = report.get('officer_summary', {}) or {}
+
+    Catarina = [
+        Paragraph('Título', styles['Label']),
+        Paragraph(str(report.get("title") or ""), styles['Value']),
+        Spacer(1, 8),
+        Paragraph('Supervisor', styles['Label']),
+        Paragraph(f"{supervisor.get('name','')} ({supervisor.get('email','')})", styles['Value']),
+    ]
+
+    Solaire = [
+        Paragraph('Tipo', styles['Label']),
+        Paragraph(str(report.get("report_type") or ""), styles['Value']),
+        Spacer(1, 8),
+        Paragraph('Oficial', styles['Label']),
+        Paragraph(f"{officer.get('name','')} ({officer.get('badge_number','')})", styles['Value']),
+    ]
+
+    grid = Table([[Catarina, Solaire]], colWidths=[280, 220])
+    grid.setStyle(TableStyle([
+        ("LEFTPADDING", (0,0), (-1,-1), 0),
+        ("RIGHTPADDING", (0,0), (-1,-1), 0),
+        ("TOPPADDING", (0,0), (-1,-1), 0),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+    ]))
+    
+    elements.append(grid)
+    elements.append(Spacer(1, 18))
+
+    # Resumen:
+    summaryTable = Table([
+        [Paragraph('Resumen', styles['Label'])],
+
+        [Table([[
+            Paragraph(str(report.get('summary') or 'Sin resumen'), ParagraphStyle(
+                name="SummaryValue", parent=styles['Justified']))
+            ]], colWidths=[None])]
+        ], colWidths=[None], hAlign='LEFT')
+
+    summaryTable.setStyle(TableStyle([
+        ("LEFTPADDING", (0,0), (-1,-1), 50),
+        ("RIGHTPADDING", (0,0), (-1,-1), 50),
+        ("TOPPADDING", (0,0), (-1,-1), 0),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+    ]))
+
+    elements.append(summaryTable)
+    elements.append(Spacer(1, 18))
+
+    # Contenido:
+    contentTable = Table([
+        [Paragraph('Contenido', styles['Label'])],
+
+        [Table([[
+            Paragraph(str(report.get('content') or ''), ParagraphStyle(
+                name="SummaryValue", parent=styles['Justified']))
+            ]], colWidths=[None])]
+        ], colWidths=[None], hAlign='LEFT')
+
+    contentTable.setStyle(TableStyle([
+        ("LEFTPADDING", (0,0), (-1,-1), 50),
+        ("RIGHTPADDING", (0,0), (-1,-1), 50),
+        ("TOPPADDING", (0,0), (-1,-1), 0),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 0),
+    ]))
+
+    elements.append(contentTable)
+    elements.append(Spacer(1, 30))
+
+    # Última actualización:
+    updatedDate = report.get("updated_at")
+    updatedSTR = updatedDate.strftime("%d/%m/%Y %H:%M") if hasattr(updatedDate, "strftime") else str(updatedDate or "")
+
+    lastUpdate = Table([[
+        Paragraph(f'Última actualización: {updatedSTR}', styles['Meta'])
+    ]], colWidths=[600])
+
+    lastUpdate.setStyle(TableStyle([
+        ("RIGHTPADDING", (0,0), (0,0), 50),
+        ("LEFTPADDING", (0,0), (0,0), 0),
+        ("TOPPADDING", (0,0), (0,0), 0),
+        ("BOTTOMPADDING", (0,0), (0,0), 0),
+    ]))
+
+    elements.append(lastUpdate)
+    elements.append(Spacer(1, 18))
+
+
+    def draw_card_bg(canvas, _doc):
+        x = doc.leftMargin
+        y = doc.bottomMargin
+        w = doc.width
+        h = doc.height
+        canvas.saveState()
+        canvas.setFillColor(colors.HexColor("#F6F8F8"))
+        canvas.setStrokeColor(colors.HexColor("#EEEEEE"))
+        canvas.rect(x, y, w, h, fill=1, stroke=1)
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=draw_card_bg, onLaterPages=draw_card_bg)
+    buffer.seek(0)
+
+    filename = f"Reporte: {report.get('title')}.pdf"
+
+    return HttpResponse(buffer, content_type='application/pdf', headers={
+        'Content-Disposition': f'attachment; filename="{filename}"'
+    })
 
 # ---------------------------------------------------------------------------- #
 

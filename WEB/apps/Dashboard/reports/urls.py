@@ -17,7 +17,7 @@ reports = [
     path('reports/<int:pk>/', views.ReportDetailView.as_view(), name='ReportDetail'),
 
     # Descarga en PDF de un reporte.
-    path('reports/<int:pk>/download/', views.ReportDownloadView.as_view(), name='ReportsDownload'),
+    path('reports/<int:report_id>/download/', views.ReportsDownload, name='ReportsDownload'),
 
     # Crear reporte.
     path('reports/create/', views.ReportsCreateView.as_view(), name='ReportsCreate'),

@@ -24,7 +24,7 @@ SISTEMA INTELIGENTE DE MONITOREO Y ASISTENCIA PARA EL BIENESTAR INTEGRAL DEL CUE
 
 <div align='center'>
     <img src='https://img.shields.io/badge/Proyecto-Académico-blue?style=for-the-badge' alt='Tipo de proyecto' />
-    <img src='https://img.shields.io/badge/Estado-En%20desarrollo-important?style=for-the-badge' alt='Estado actual' />
+    <img src='https://img.shields.io/badge/Estado-Finalizado-important?style=for-the-badge' alt='Estado actual' />
     <img src='https://img.shields.io/badge/Team-Artemis-critical?style=for-the-badge' alt='Equipo desarrollador' />
 </div>
 
@@ -66,39 +66,22 @@ git clone --single-branch --branch <Nombre de la rama> https://github.com/leyvat
 #### ESTRUCTURA GENERAL
 ``` bash
 
-API ''' Desarrollo de API '''
-├── apps
-│   ├── alerts
-│   ├── biometrics
-│   ├── events
-│   ├── geolocation
-│   ├── recommendations
-│   ├── reports
-│   └── users
+WEB ''' Desarrollo de aplicación web. '''
+├── apps/Dashboard/
+│   ├── alerts/
+│   ├── analytics/
+│   ├── geolocation/
+│   ├── officers/
+│   ├── reports/
+│   ├── supervisors/
+│   └── ...
 │
-├── config
+├── Artemis/
 │   ├── settings
 │   └── ...
 │
-├── core
-│   └── ...
-│
-├── requirements
-│   └── ...
-│
-├── manage.py
-├── readme.md
-├── readme.md
-└── pytest.ini
+└── .env
 
-Mobile ''' Desarrollo de aplicación móvil. '''
-└── ...
-
-WEB ''' Desarrollo de aplicación web. '''
-└── ...
-
-SmartAPP ''' Desarrollo de aplicación SMARTWATCH. '''
-└── ...
 ```
 
 <!-- ----------------------------------------------------------------------- -->
@@ -110,10 +93,9 @@ SmartAPP ''' Desarrollo de aplicación SMARTWATCH. '''
 
 <br>
 
-- [ ] API para el envío de datos entre aplicaciones (En desarrollo)
-- [ ] Aplicación móvil destinada a los oficiales (En desarrollo)
-- [ ] Aplicación web destinada a los supervisores (En desarrollo)
-- [ ] Aplicación de smartwatch para los oficiales (En fases iniciales)
+- [x] API para el envío de datos entre aplicaciones (Finalizado)
+- [x] Aplicación web destinada a los supervisores (Finalizado)
+- [x] Entrenamiento de modelos de ML (Finalizado)
 
 <!-- ----------------------------------------------------------------------- -->
 
@@ -126,10 +108,10 @@ SmartAPP ''' Desarrollo de aplicación SMARTWATCH. '''
 
 | Nombre | Perfil de GitHub |
 |---|---|
-| Alejandro H. González | [Pendiente](https://github.com/#) |
-| Ed Rubio | [Lord of Castamere](https://github.com/lord-of-castamere) |
+| Alejandro H. González | [AlejandroHdzG](https://github.com/AlejandroHdzG) |
+| Ed Rubio | [Ed of Astora](https://github.com/ed-of-astora) |
 | Efraín L. Dávila | [leyvatx](https://github.com/leyvatx) |
-| Isaac L. Guerrero | [Pendiente](https://github.com/#) |
+| Isaac L. Guerrero | [CiberHacks](https://github.com/CiberHacks) |
 
 <!-- ----------------------------------------------------------------------- -->
 

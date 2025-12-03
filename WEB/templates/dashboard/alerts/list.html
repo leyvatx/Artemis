@@ -103,9 +103,15 @@
                             <span title='{{ alert.created_at }}'>{{ alert.time_ago }}</span>
                         </td>
                         <td class='actions-cell'>
-                            <a href='{% url "dashboard:OfficerDetail" alert.officer_id %}' class='btn-action btn-view' title='Ver detalle del oficial'>
-                                <span class='material-symbols-outlined'>visibility</span>
-                            </a>
+                            {% if alert.officer_id %}
+                                <a href='{% url "dashboard:OfficerDetail" alert.officer_id %}' class='btn-action btn-view' title='Ver detalle del oficial'>
+                                    <span class='material-symbols-outlined'>visibility</span>
+                                </a>
+                            {% else %}
+                                <span class='btn-action btn-view disabled' title='Officer ID no disponible'>
+                                    <span class='material-symbols-outlined'>visibility_off</span>
+                                </span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -165,7 +171,6 @@
         document.getElementById('high-count').textContent = highCount;
     }
 
-    // Inicializar contadores
     updateCounters();
 </script>
 

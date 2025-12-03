@@ -1,8 +1,8 @@
 
 # -- VIEWS ------------------------------------------------------------------- #
 
-import requests
-import logging
+import requests, logging
+from datetime import datetime
 from .mixins import LoginRequiredMixin
 from .endpoints import AUTH_ENDPOINTS, DATA_ENDPOINTS
 
@@ -14,6 +14,7 @@ from django.shortcuts import render, redirect
 
 ''' CLASE: Inicio de sesión '''
 logger = logging.getLogger(__name__)
+
 class LoginView(View):
     template_name = 'signin.html'
     AUTH_URL = AUTH_ENDPOINTS['LOGIN']
@@ -84,8 +85,20 @@ class HomeView(LoginRequiredMixin, View):
         API_URL = DATA_ENDPOINTS['HOME'].format(id=supervisorId)
 
         response = requests.get(API_URL)
-        data = response.json() if response.status_code == 200 else {}
 
+        if response.status_code == 200:
+            data = response.json()
+            timestampSTR = data.get('timestamp')
+
+            if timestampSTR:
+                try:
+                    dateFormat = datetime.fromisoformat(timestampSTR)
+                    data['timestamp'] = dateFormat 
+                except ValueError:
+                    data['timestamp'] = None
+        else:
+            data = {}
+            
         return render(request, self.template_name, data)
 
 # ---------------------------------------------------------------------------- #

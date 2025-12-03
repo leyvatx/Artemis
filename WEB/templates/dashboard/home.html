@@ -13,15 +13,14 @@
         <div>
             <h2>Centro de monitorización</h2>
             <p>Bienvenido, {{ supervisor.name }}</p>
-            <small>Última actualización: {{ timestamp|date:"d/m/Y H:i" }}</small>
-        </div>
+            <small>Última actualización: <strong>{{ timestamp|date:"d M Y - H:i:s" }}</strong></small>
 
         <div class='dashboard-nav'>
             <a href="{% url 'dashboard:OfficersList' %}"><span class='material-symbols-outlined'>groups</span>
                 Oficiales</a>
             <a href="{% url 'dashboard:ReportsList' %}"><span class='material-symbols-outlined'>description</span>
                 Reportes</a>
-            <a href="{% url 'dashboard:Home' %}"><span class='material-symbols-outlined'>insights</span> Análisis ML</a>
+            <a href='{% url "dashboard:Analytics" %}'><span class='material-symbols-outlined'>insights</span> Análisis ML</a>
             <a href="{% url 'dashboard:Geolocation' %}"><span class='material-symbols-outlined'>map</span> Mapa</a>
         </div>
     </section>

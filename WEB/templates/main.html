@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Perfil de usuario -->
-                <a class='main-header-user-info' href='#'>
+                <a class='main-header-user-info' href='{% url "dashboard:SupervisorDetail" auth_user.id %}'>
                     {% if auth_user.picture %}
                     <img class='supervisor-picture' src='{{ auth_user.picture }}'
                         alt='Foto del supervisor: {{ auth_user.name }}'>
