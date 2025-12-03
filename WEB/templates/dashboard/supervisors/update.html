@@ -1,0 +1,66 @@
+
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+    <link href='{% static "css/dashboard/form.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}{{ titleSection }}{% endblock title %}
+
+
+{% block content %}
+<div class='dashboard-container'>
+
+    <header class='crud-header'>
+        <div class='crud-header-info'>
+            <h2>Edición de información</h2>
+            <span>Actualice su información de usuario.</span>
+        </div>
+
+        <a href="{% url 'dashboard:SupervisorDetail' supervisor.id %}" class='crud-header-back'>
+            <span class='material-symbols-outlined'>arrow_back</span>
+            <strong>Regresar</strong>
+        </a>
+    </header>
+
+    <section class='crud-form'>
+        <form method='POST' enctype='multipart/form-data'>{% csrf_token %}
+
+            <div class='form-grid'>
+
+                <div class='form-control'>
+                    <label>Nombre completo</label>
+                    <input type='text' name='name' value="{{ supervisor.name|default:'' }}"
+                        maxlength='64' required placeholder='Ej. John Doe' />
+                </div>
+
+                <div class='form-control'>
+                    <label>Correo electrónico</label>
+                    <input type='email' name='email' value="{{ supervisor.email|default:'' }}"
+                        maxlength='128' required placeholder='solaire@astora.sun' />
+                </div>
+
+                <div class='form-control file-image'>
+                    <label>Fotografía</label>
+
+                    {% if supervisor.picture %}
+                        <a class='picture-preview' href='{{ supervisor.picture }}' target='_blank'>Mostrar foto actual</a>
+                    {% endif %}
+               
+                    <input type='file' name='picture' accept='image/*' />
+                </div>
+            </div>
+
+            <div class='form-actions'>
+                <button type='submit' class='action-save'>
+                    <span class='material-symbols-outlined'>save</span>
+                    <strong>Actualizar</strong>
+                </button>
+            </div>
+
+        </form>
+    </section>
+
+</div>
+
+{% endblock content %}

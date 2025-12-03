@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!supervisorId) return;
 
         try {
-            const apiBaseUrl = document.body.getAttribute('data-api-url') || 'http://127.0.0.1:8000/api';
+            const apiBaseUrl = 'http://165.227.21.22/api';
             const apiUrl = `${apiBaseUrl}/supervisors/${supervisorId}/alerts/?limit=3`;
             const response = await fetch(apiUrl, {
                 method: 'GET',

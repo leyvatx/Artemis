@@ -4,6 +4,7 @@ from django.contrib import messages
 import requests
 from django.conf import settings
 from ..mixins import LoginRequiredMixin
+from apps.Dashboard.endpoints import BIOMETRICS_ENDPOINTS
 
 
 class AlertsListView(LoginRequiredMixin, View):
@@ -23,12 +24,12 @@ class AlertsListView(LoginRequiredMixin, View):
         error = None
         
         try:
-            api_url = f"{settings.API_BASE_URL}/supervisors/{supervisor_id}/alerts/?limit=100"
-            response = requests.get(api_url, timeout=10)
+            API_URL = BIOMETRICS_ENDPOINTS['LIST']
+            response = requests.get(API_URL, timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                alerts = data.get('alerts', [])
+                alerts = data.get('data', [])
             elif response.status_code == 404:
                 error = "No se encontró el supervisor o no tiene oficiales asignados"
             else:

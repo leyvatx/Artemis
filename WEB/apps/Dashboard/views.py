@@ -88,5 +88,10 @@ class HomeView(LoginRequiredMixin, View):
 
         return render(request, self.template_name, data)
 
+# ---------------------------------------------------------------------------- #
+
+''' FUNCIÓN: 404 NOT FOUND '''
+def not_found_404(request, exception):
+    return render(request, '404.html', status=404)
 
 # ---------------------------------------------------------------------------- #

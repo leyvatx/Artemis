@@ -1,0 +1,149 @@
+<!-- ----------------------------------------------------------------------- -->
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang='es'>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<head>
+    <meta charset='UTF-8' />
+    <meta name='theme-color' content='#F6F8F8' media='(prefers-color-scheme: light)' />
+
+    <meta name='author' content='Artemis ― (Ed Rubio)' />
+    <meta name='description' content='ERROR 404: NOT FOUND' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+
+    <title>Página no encontrada | Artemis</title>
+    <link rel='shortcut icon' type='image/png' href='{% static "images/favicon.png" %}'>
+
+    <!-- Google Icons CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+
+    <style>
+        @font-face {
+            font-family: 'GemunuLibre';
+            src: url('../fonts/GemunuLibre/GemunuLibre.ttf') format('truetype-variations');
+            font-weight: 100 900;
+            font-display: swap;
+        }
+
+        @view-transition {
+            navigation: auto;
+        }
+
+        * {
+            user-select: none;
+            box-sizing: border-box;
+            transition: all .24s ease-in-out;
+            interpolate-size: allow-keywords;
+            font-family: 'GemunuLibre', sans-serif;
+        }
+
+        html,
+        body {
+            display: flex;
+            min-width: 100dvw;
+            min-height: 100dvh;
+            margin: 0;
+            padding: 0;
+
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+            overscroll-behavior: none;
+        }
+
+        body {
+            background-repeat: no-repeat;
+            background-position: right;
+            background-size: cover;
+            background-attachment: fixed;
+
+            background-image: linear-gradient(rgba(28, 28, 30, .2), rgba(28, 28, 30, .2)), url('../statics/images/404.webp');
+        }
+
+        .main-content {
+            flex-grow: 1;
+            min-height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .return-home {
+            position: fixed;
+            bottom: 8rem;
+            left: 8rem;
+            padding: .8rem 1.6rem;
+            align-items: center;
+            width: fit-content;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-wrap: nowrap;
+            background-color: rgba(208, 221, 237, .4);
+            border: .0125rem solid #81A4CD;
+        }
+
+        .return-home span {
+            margin-right: .5rem;
+            color: #81A4CD;
+        }
+
+        .return-home strong {
+            color: #445D5D;
+            text-transform: uppercase;
+        }
+
+        .return-home:hover {
+            background-color: #5A78B6;
+        }
+
+        .return-home:hover span,
+        .return-home:hover strong {
+            color: #EEEEEE;
+        }
+
+        .error-block {
+            margin: auto auto auto 8rem;
+            text-align: left;
+            color: #445D5D;
+            padding-bottom: 18rem;
+        }
+
+        .error-block h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: .75rem;
+            color: #B94949;
+            text-shadow: rgba(149, 157, 165, .8) 0 .5rem 1.5rem;
+        }
+
+        .error-block p {
+            font-size: 1.25rem;
+            color: #445D5D;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<!-- ----------------------------------------------------------------------- -->
+
+<body>
+    <main class='main-content'>
+        <div class='error-block'>
+            <h1>ERROR 404</h1>
+            <p>Página no encontrada</p>
+        </div>
+
+        <a href='{% url "dashboard:Home" %}' class='return-home'>
+            <span class='material-symbols-outlined'>add</span>
+            <strong>Regresar al Dashboard</strong>
+        </a>
+    </main>
+</body>
+
+</html>
+
+<!-- ----------------------------------------------------------------------- -->

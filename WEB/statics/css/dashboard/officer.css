@@ -11,6 +11,7 @@
 
 .officer-info {
     padding: 2rem;
+    margin-top: 2rem;
     display: grid; gap: 2rem;
     grid-template-columns: 14rem auto;
 }
@@ -85,7 +86,7 @@
 /* -------------------------------------------------------------------------- */
 
 .biometrics-section, .reports-section,
-.alerts-section {
+.alerts-section, .links-section {
     padding: 2rem;
     border-top: .0125rem solid var(--border-color);
 }
@@ -144,18 +145,124 @@
 
 /* -------------------------------------------------------------------------- */
 
-/* Reportes */
+.report-link {
+    display: block;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: .25rem;
+    background-color: var(--canvas-color);
+    border: .0125rem solid var(--border-color); 
+}
 
-/* -------------------------------------------------------------------------- */
+.report-link strong {
+    font-size: 1.1rem;
+}
 
-/* Alertas */
+.report-link p {
+    margin: .5rem 0 0;
+    color: var(--text-secondary);
+    font-size: .9rem; line-height: 1.4;
+}
 
-/* -------------------------------------------------------------------------- */
+.report-link:hover {
+    background-color: var(--border-color);
+}
 
 .placeholder {
     padding: 1.5rem;
     text-align: center;
+    border-radius: .25rem;
     color: var(--text-secondary);
+    background-color: var(--canvas-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.supervisor-picture-profile {
+    border-radius: .5rem;
+    width: auto; height: 14rem;
+    aspect-ratio: 1 / 1; object-fit: cover;
+    box-shadow: rgba(149, 157, 165, .4) 0 .5rem 1.5rem;
+}
+
+.supervisor-no-picture {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    border-radius: .5rem;
+    justify-content: center;
+    width: 14rem; height: 14rem;
+    color: var(--background-color);
+    font-size: 8rem; font-weight: bold;
+    background-color: var(--state-hover);
+    box-shadow: rgba(149, 157, 165, .4) 0 .5rem 1.5rem;
+}
+
+.supervisor-info {
+    padding-top: 2rem;
+    padding-left: 1rem;
+    justify-content: space-between;
+    display: flex; flex-direction: row;
+}
+
+.action-update {
+    padding: .8rem 1.6rem;
+    align-items: center; font-weight: bold;
+    height: fit-content;
+    display: flex; flex-wrap: nowrap;
+    background-color: var(--info-background);
+    border: .0125rem solid var(--info-border);
+}
+
+.action-update span {
+    margin-right: .5rem;
+    color: var(--info-border);
+}
+
+.action-update strong {
+    font-size: medium;
+    font-weight: inherit;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.action-update:hover {
+    background-color: var(--info-text);
+}
+
+.action-update:hover span,
+.action-update:hover strong {
+    color: var(--canvas-color);
+}
+
+/* -------------------------------------------------------------------------- */
+
+.links-grid {
+    gap: 1.5rem;
+    display: flex;
+    margin-bottom: 1.5rem;
+    flex-direction: row;
+}
+
+.papoi-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: .5rem 2rem;
+    border-radius: .25rem;
+    background-color: var(--canvas-color);
+    border: .0125rem solid var(--border-color); 
+}
+
+.papoi-link p {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-left: .75rem;
+    color: var(--text-secondary);
+}
+
+.papoi-link:hover {
+    background-color: var(--border-color);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -18,19 +18,25 @@
         <!-- Información general -->
         <section class='officer-info'>
             <div class='info-left'>
-                <img class='officer-picture' src='{{ officer.picture|default:"" }}' alt='Foto del oficial: {{ officer.name }}'>
+
+                {% if officer.picture %}
+                <img class='officer-picture' src='{{ officer.picture }}' alt='Foto del oficial: {{ officer.name }}'>
+                {% else %}
+                <img class='officer-picture' src='{% static "images/unknown.jpeg" %}' alt='Oficial: {{ officer.name }}'>
+                {% endif %}
+
             </div>
 
             <div class='info-right'>
-                <h1 class='officer-name'>{{ officer.name|default:"Sin nombre" }}</h1>
-                <span class='officer-rank'>{{ officer.rank|capfirst|default:"Sin rango" }}</span>
+                <h1 class='officer-name'>{{ officer.name }}</h1>
+                <span class='officer-rank'>{{ officer.rank|capfirst }}</span>
 
-                <div class='officer-status {{ officer.status|lower|default:"unknown" }}'>
-                    {{ officer.status_label|default:"Desconocido" }}
+                <div class='officer-status {{ officer.status|lower }}'>
+                    {{ officer.status_label }}
                 </div>
 
                 <div class='officer-badge'>
-                    <strong>Placa:</strong> {{ officer.badge_number|default:"N/A" }}
+                    <strong>Placa:</strong> {{ officer.badge_number }}
                 </div>
             </div>
         </section>
@@ -70,140 +76,76 @@
         <!-- Reportes -->
         <section class='reports-section'>
             <h2>Reportes</h2>
-            <div class='placeholder'>No se ha reportado ninguna incidencia.</div>
-        </section>
 
-        <!-- Alertas -->
-        <section class='alerts-section'>
-            <h2>Alertas</h2>
-            <div id='officer-alerts-container'>
-                <div class='placeholder'>Cargando alertas...</div>
-            </div>
+            {% for report in reports %}
+                <a href='{% url "dashboard:ReportDetail" report.report_id %}' class='report-link'>
+                    <strong>{{ report.title }}</strong> ({{ report.report_type }}) - {{ report.status }}
+                    <p>{{ report.summary }}</p>
+                </a>
+            {% empty %}
+                <div class='placeholder'>No se ha reportado ninguna incidencia.</div>
+            {% endfor %}
         </section>
     </div>
 </div>
 
 
 <script>
-    // Cargar alertas del oficial
-    async function loadOfficerAlerts() {
-        const officerId = {{ officer.id }};
-        const apiBaseUrl = document.body.getAttribute('data-api-url') || 'http://127.0.0.1:8000/api';
-        
-        try {
-            const response = await fetch(`${apiBaseUrl}/alerts/?user=${officerId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                credentials: 'include'
-            });
+    /* CONFIGURACIÓN -------------------------------------------------------- */
 
-            if (!response.ok) throw new Error('Error al cargar alertas');
-
-            const data = await response.json();
-            const container = document.getElementById('officer-alerts-container');
-
-            if (data.results && data.results.length > 0) {
-                container.innerHTML = '';
-                data.results.forEach(alert => {
-                    const alertElement = document.createElement('div');
-                    alertElement.className = `alert-card alert-${alert.level.toLowerCase()}`;
-                    alertElement.innerHTML = `
-                        <div class='alert-card-header'>
-                            <span class='alert-badge'>${alert.level}</span>
-                            <span class='alert-type'>${alert.alert_type_name}</span>
-                            <span class='alert-status'>${alert.status}</span>
-                        </div>
-                        <div class='alert-card-body'>
-                            <p><strong>${alert.description}</strong></p>
-                            ${alert.location ? `<p><small>Ubicación: ${alert.location}</small></p>` : ''}
-                            <p><small>Creada: ${new Date(alert.created_at).toLocaleString('es-MX')}</small></p>
-                        </div>
-                    `;
-                    container.appendChild(alertElement);
-                });
-            } else {
-                container.innerHTML = '<div class="placeholder">No se han generado alertas recientes.</div>';
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            const container = document.getElementById('officer-alerts-container');
-            container.innerHTML = '<div class="placeholder error">Error al cargar las alertas</div>';
-        }
-    }
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Cargar alertas cuando se carga la página
-    document.addEventListener('DOMContentLoaded', loadOfficerAlerts);
-
-    // Configuración de tiempo.
-    const INTERVAL_MS = 3000;
+    const INTERVAL_MS = 5000;
     const WINDOW_POINTS = 20;
     const STRESS_WINDOW = 10;
 
-    // Parámetros de escala dinámica
     const BASELINE_MAX = 150;
     const MULTIPLIER = 1.4;
     const MIN_ALLOWED_MAX = 100;
     const MAX_ALLOWED_MAX = 600;
 
-    // RANDOM-WALK walk para semilla inicial.
+    /* GENERADORES DE SEMILLA ------------------------------------------------------ */
+
     function randomWalk(seed, steps, stepSize = 3, min = 55, max = 140) {
         const arr = [];
         let v = seed;
+
         for (let i = 0; i < steps; i++) {
             v += (Math.random() - 0.5) * stepSize;
             v = Math.max(min, Math.min(max, v));
             arr.push(Math.round(v));
         }
+
         return arr;
     }
 
-    // Color por zona BPM
     function bpmColor(bpm) {
         if (bpm < 85) return '#2196F3';
         if (bpm < 110) return '#4CAF50';
         if (bpm < 135) return '#FFEB3B';
         if (bpm < 160) return '#FF9800';
-
         return '#E53935';
     }
 
-    // Ventana inicial.
+    /* SEMILLAS ------------------------------------------------------------- */
+
     const now = Date.now();
     const initialStart = now - (WINDOW_POINTS - 1) * INTERVAL_MS;
 
-    // Sembrar BPM.
-    const bpmSeedValues = randomWalk(80, WINDOW_POINTS);
-    const seededBpm = bpmSeedValues.map((y, i) => {
-        const t = initialStart + i * INTERVAL_MS;
-        return { x: t, y, color: bpmColor(y) };
-    });
+    let seededBpm = [];
+    let stressSeedValues = [];
 
-    // Sembrar estrés.
-    const stressSeedValues = randomWalk(35, STRESS_WINDOW, 6, 5, 85);
+    if ("{{ officer.id }}" != 2) {
+        const bpmSeedValues = randomWalk(80, WINDOW_POINTS);
 
-    // Gráfico BPM:
-    const bpmChart = Highcharts.chart('bpmChart', {
-        accessibility: {
-            enabled: false
-        },
+        seededBpm = bpmSeedValues.map((y, i) => ({
+            x: initialStart + i * INTERVAL_MS, y, color: bpmColor(y) }));
+
+        stressSeedValues = randomWalk(35, STRESS_WINDOW, 6, 5, 85);
+    }
+
+    /* CHART: BPM ----------------------------------------------------------- */
+
+    const bpmChart = Highcharts.chart("bpmChart", {
+
         chart: {
             type: 'column', backgroundColor: 'transparent',
             height: 420, marginBottom: 50, animation: true,
@@ -215,31 +157,25 @@
 
         xAxis: {
             type: 'datetime',
-            title: { text: null },
+            min: initialStart, max: now,
+            tickPixelInterval: 80,
+            ordinal: false,
+
+            gridLineWidth: 0,
+            startOnTick: false, endOnTick: false,
+
             labels: {
                 formatter: function () {
                     return Highcharts.dateFormat('%H:%M:%S', this.value);
-                },
-                style: { fontSize: '12px', color: '#445D5D' }
-            },
-            gridLineWidth: 0,
-            min: initialStart,
-            max: now,
-            tickPixelInterval: 80,
-            startOnTick: false,
-            endOnTick: false,
-            ordinal: false
+                }, style: { fontSize: '12px', color: '#445D5D' }
+            }
         },
 
         yAxis: {
-            title: { text: null },
-            min: 0,
-            max: BASELINE_MAX,
             gridLineWidth: 0,
-            labels: {
-                align: 'right', x: -10,
-                style: { fontSize: '12px', color: '#445D5D' }
-            },
+            title: { text: null },
+            min: 0, max: BASELINE_MAX,
+            labels: { style: { fontSize: '12px', color: '#445D5D' } }
         },
 
         tooltip: {
@@ -248,15 +184,12 @@
                 const formattedTime = Highcharts.dateFormat('%a, %H:%M:%S', this.x);
                 return `<b>${formattedTime}</b><br/>Ritmo cardíaco: <b>${Math.round(this.y)} BPM</b>`;
             },
+
             dateTimeLabelFormats: {
                 millisecond: '%H:%M:%S.%L',
-                second: '%H:%M:%S',
-                minute: '%H:%M',
-                hour: '%H:%M',
-                day: '%e. %b',
-                week: '%e. %b',
-                month: '%b \'%y',
-                year: '%Y'
+                second: '%H:%M:%S', minute: '%H:%M',
+                hour: '%H:%M', day: '%e. %b. %Y',
+                week: '%e. %b', month: '%b. %y', year: '%Y'
             }
         },
 
@@ -269,37 +202,28 @@
                 animation: { duration: 220, easing: 'easeOutQuad' }
             },
             series: {
-                dataLabels: { enabled: false },
                 states: { hover: { enabled: false } },
                 turboThreshold: 0
             }
         },
 
-        series: [{
-            name: 'BPM',
-            type: 'column',
-            data: seededBpm
-        }],
-
+        series: [{ name: 'BPM', type: 'column', data: seededBpm }],
         credits: { enabled: false }
     });
 
-    // Gráfico de estrés:
-    const stressChart = Highcharts.chart('stressChart', {
-        accessibility: {
-            enabled: false
-        },
+    /* CHART: STRESS -------------------------------------------------------- */
+
+    const stressChart = Highcharts.chart("stressChart", {
         chart: {
             type: 'gauge', backgroundColor: 'transparent',
             height: '90%', animation: { duration: 300 },
             style: { fontFamily: 'inherit', color: 'inherit' },
-        },
-
-        title: { text: null },
-
+        }, title: { text: null },
+        
         pane: {
             startAngle: -140,
             endAngle: 140,
+
             background: [{
                 backgroundColor: 'transparent',
                 borderWidth: 0, outerRadius: '100%'
@@ -307,20 +231,17 @@
         },
 
         yAxis: {
-            min: 0,
-            max: 100,
+            min: 0, max: 100,
             tickPosition: 'outside',
-            tickLength: 6,
-            tickWidth: 1,
             tickColor: '#445D5D',
             minorTickInterval: null,
+            tickLength: 6, tickWidth: 1,
+
             labels: {
                 distance: 24,
                 style: { color: '#445D5D', fontSize: '12px' }
-            },
-            title: {
-                text: null
-            },
+            }, title: { text: null },
+
             plotBands: [
                 { from: 0, to: 30, color: 'rgba(76, 175, 80, .4)' },
                 { from: 30, to: 60, color: 'rgba(255, 235, 59, .4' },
@@ -334,126 +255,120 @@
                 dial: {
                     radius: '80%',
                     backgroundColor: '#445D5D',
-                    baseWidth: 6,
-                    topWidth: 1,
+                    baseWidth: 6, topWidth: 1,
                     baseLength: '20%',
                     rearLength: '-20%'
                 },
                 pivot: {
                     radius: 0, borderWidth: 0,
                     backgroundColor: 'transparent',
-
                 }
-            },
-            series: { animation: { duration: 300 } }
+            }, series: { animation: { duration: 300 } }
         },
 
-        series: [{
-            name: 'Estrés',
-            data: [stressSeedValues[stressSeedValues.length - 1] || 35],
-            tooltip: { enabled: false },
-            dataLabels: {
-                useHTML: true,
-                formatter: function () {
-                    const v = Math.round(this.y);
-                    const color = (v < 30) ? '#4CAF50' : (v < 60) ? '#FFEB3B' : (v < 85) ? '#FF9800' : '#E53935';
-                    return `<div style="text-align:center">
-                  <div style="font-size:28px; font-weight:600; color:${color}; line-height:1">${v}</div>
-                  <div style="font-size:11px; color:#445D5D; margin-top:2px">Nivel</div>
-                </div>`;
-                },
-                borderWidth: 0,
-                y: 0
+        series: [
+            {
+                name: 'Estrés', tooltip: { enabled: false },
+                data: [ stressSeedValues.length ? stressSeedValues[stressSeedValues.length - 1] : 0 ],
+
+                dataLabels: {
+                    useHTML: true,
+
+                    formatter: function () {
+                        const v = Math.round(this.y);
+                        const color = (v < 30) ? '#4CAF50' : (v < 60) ? '#FFEB3B' : (v < 85) ? '#FF9800' : '#E53935';
+
+                        return `<div style="text-align:center">
+                            <div style="font-size:28px; font-weight:600; color:${color}; line-height:1">${v}</div>
+                            <div style="font-size:11px; color:#445D5D; margin-top:2px">Nivel</div>
+                            </div>`; 
+                    }, borderWidth: 0, y: 0
+                }
             }
-        }],
+        ],
 
         credits: { enabled: false }
     });
 
-    // Función de actualización:
+    /* ACTUALIZADORES ------------------------------------------------------- */
+
     function shiftStress(label, value) {
-        const sSeries = stressChart.series[0];
-        const point = sSeries.points[0];
-
-        // Determinar color según zona.
-        const color = (value < 30) ? '#4CAF50' : (value < 60) ? '#FFEB3B' : (value < 85) ? '#FF9800' : '#E53935';
-        point.update(value, true, { duration: 300 });
-
-        sSeries.update({
-            dial: {
-                backgroundColor: '#445D5D'
-            }
-        }, false);
-
-        stressChart.redraw();
-    }
-
-    function pushUpPoint(series, point) {
-        series.addPoint({ x: point.x, y: 0, color: point.color }, true, true);
-        const last = series.data[series.data.length - 1];
-        setTimeout(() => last.update({ y: point.y, color: point.color }, true), 0);
+        const point = stressChart.series[0].points[0];
+        point.update(value, true);
     }
 
     function adjustYAxisDynamic(currentBpm) {
         const series = bpmChart.series[0];
-        // Valores numéricos recientes.
-        const recentValues = series.data
-            .map(p => (p && typeof p.y === 'number' ? p.y : null))
-            .filter(v => v !== null);
+        const values = series.data.map(p => p.y).concat(currentBpm);
 
-        // Incluir el valor actual.
-        recentValues.push(currentBpm);
-
-        const recentMax = recentValues.length ? Math.max(...recentValues) : currentBpm;
-
-        let targetMax;
-        if (recentMax <= 0) {
-            targetMax = BASELINE_MAX * 2;
-        } else {
-            targetMax = Math.max(BASELINE_MAX, Math.ceil(recentMax * MULTIPLIER));
-        }
-
-        // limitar a rangos razonables.
+        const recentMax = Math.max(...values);
+        let targetMax = Math.max(BASELINE_MAX, Math.ceil(recentMax * MULTIPLIER));
         targetMax = Math.min(Math.max(targetMax, MIN_ALLOWED_MAX), MAX_ALLOWED_MAX);
-        bpmChart.yAxis[0].update({ max: targetMax, min: 0 }, false, { duration: 300 });
+
+        bpmChart.yAxis[0].update({ max: targetMax });
     }
 
-    // Actualización de datos:
-    function updateCharts(currentBpm, stress) {
-        const currentTime = Date.now();
+    /* FUNCIÓN CENTRAL: updateCharts() -------------------------------------- */
+
+    // variable global para recordar el último timestamp procesado
+    let lastCreatedAt = null;
+
+    function updateCharts(currentBpm, stress, createdAt = null, fromApi = true) {
+        let currentTime = createdAt ? new Date(createdAt).getTime() : Date.now();
+        if (isNaN(currentTime)) currentTime = Date.now();
+
+        if (fromApi) {
+            if (lastCreatedAt === currentTime) {
+                return; // Evita duplicados.
+            }
+
+            lastCreatedAt = currentTime;
+        }
+
+        const series = bpmChart.series[0];
         const color = bpmColor(currentBpm);
 
         adjustYAxisDynamic(currentBpm);
         bpmChart.xAxis[0].setExtremes(
             currentTime - (WINDOW_POINTS - 1) * INTERVAL_MS,
-            currentTime, false);
-        pushUpPoint(bpmChart.series[0], { x: currentTime, y: currentBpm, color });
+            currentTime, false
+        );
 
-        // BPM:
-        document.getElementById('currentBPMDisplay').innerText = `${currentBpm} BPM`;
+        const shouldShift = series.data.length >= WINDOW_POINTS;
+        series.addPoint({ x: currentTime, y: currentBpm, color }, true, shouldShift);
 
-        // Estrés:
+        // BPM actual:
+        document.getElementById("currentBPMDisplay").innerText = currentBpm + " BPM";
+
+        // Estrés actual:
         shiftStress(new Date(currentTime).toLocaleTimeString(), stress);
     }
 
-    // Valor inicial:
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('currentBPMDisplay').innerText = bpmSeedValues[bpmSeedValues.length - 1] || 80;
+    /* VALOR INICIAL DEL DISPLAY -------------------------------------------- */
+
+    document.addEventListener("DOMContentLoaded", () => {
+        if ("{{ officer.id }}" != 2) {
+            const last = seededBpm[seededBpm.length - 1];
+            document.getElementById("currentBPMDisplay").innerText = `${last.y} BPM`;
+        }
     });
 
-    // ACTUALIZACIÓN AUTOMÁTICA — Llamada a API
-    const BIOMETRICS_URL = '{% url "dashboard:OfficerBiometrics" %}';
-    const badgeNumber = '{{ officer.badge_number }}';
+    /* PETICIÓN AL API ------------------------------------------------------ */
+
+    const BIOMETRICS_URL = "{% url 'dashboard:OfficerBiometrics' %}";
+    const officerId = "{{ officer.id }}";
+
 
     setInterval(() => {
-        fetch(`${BIOMETRICS_URL}?badge=${badgeNumber}`)
+        fetch(`${BIOMETRICS_URL}?officer=${officerId}`)
             .then(res => res.json())
             .then(data => {
-                if (data && typeof data.bpm !== 'undefined' && typeof data.stress !== 'undefined') {
-                    updateCharts(data.bpm, data.stress);
+                if (data.bpm !== undefined && data.stress !== undefined) {
+                    updateCharts(data.bpm, data.stress, data.created_at, true);
                 }
             })
-            .catch(err => console.error('Error biométrico: ', err));
+            .catch(err => console.error("Error biométrico: ", err));
     }, INTERVAL_MS);
 </script>
+
 {% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'main.html' %}{% load static %}
+
+{% block stylesheet %}
+<link href='{% static "css/dashboard/officer.css" %}' rel='stylesheet' />
+{% endblock stylesheet %}
+
+{% block title %}Mi perfil{% endblock title %}
+
+{% block content %}
+<div class='dashboard-container'>
+    <div class='detail-container'>
+
+        <!-- Información general -->
+        <section class='officer-info'>
+            {% if supervisor.picture %}
+            <img class='supervisor-picture-profile' src='{{ supervisor.picture }}' alt='Foto del usuario'>
+            {% else %}
+            <span class='supervisor-no-picture'>{{ supervisor.name|first }}</span>
+            {% endif %}
+
+            <div class='supervisor-info'>
+                <div>
+                    <h1 class='officer-name'>{{ supervisor.name }}</h1>
+                    <div class='officer-badge'>
+                        <strong>Correo:</strong> {{ supervisor.email }}
+                    </div>
+                </div>
+
+                <a href='{% url "dashboard:SupervisorUpdate" supervisor.id %}' class='action-update'>
+                    <span class='material-symbols-outlined'>edit</span>
+                    <strong>Actualizar información</strong>
+                </a>
+            </div>
+        </section>
+
+        <!-- Navegación -->
+        <section class='links-section'>
+            <h2>Accesos directos</h2>
+
+            <div class='links-grid'>
+                <a href='{% url "dashboard:OfficersList" %}' class='papoi-link'>
+                    <span class='material-symbols-outlined'>local_police</span>
+                    <p>Gestionar oficiales</p></a>
+        
+                <a href='{% url "dashboard:Geolocation" %}' class='papoi-link'>
+                    <span class='material-symbols-outlined'>location_searching</span>
+                    <p>Consultar ubicaciones</p></a>
+
+                <a href='{% url "dashboard:OfficersList" %}' class='papoi-link'>
+                    <span class='material-symbols-outlined'>planner_review</span>
+                    <p>Análisis de datos</p></a>
+
+                <a href='{% url "dashboard:ReportsList" %}' class='papoi-link'>
+                    <span class='material-symbols-outlined'>library_books</span>
+                    <p>Gestionar reportes</p></a>
+            </div>
+
+            <div class='placeholder'>"Cada dato aquí tiene un propósito, y cada propósito te pertenece. Tu perfil es la memoria viva de un trabajo que no se detiene."</div>
+        </section>
+
+    </div>
+</div>
+
+
+{% endblock %}

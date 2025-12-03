@@ -19,6 +19,9 @@ from .officers.urls import officers
 # Sección de reportes (URLs)
 from .reports.urls import reports
 
+# Sección de supervisor/perfil (URLs)
+from .supervisors.urls import supervisor
+
 # ---------------------------------------------------------------------------- #
 
 app_name = 'dashboard'
@@ -31,6 +34,6 @@ urlpatterns = [
     # Inicio:
     path('', HomeView.as_view(), name='Home'),
 
-] + analytics + alerts + geolocation + officers + reports
+] + analytics + alerts + geolocation + officers + reports + supervisor
 
 # ---------------------------------------------------------------------------- #

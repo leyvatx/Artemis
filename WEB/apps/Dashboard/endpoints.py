@@ -1,10 +1,7 @@
 
 # -- ENDPOINTS --------------------------------------------------------------- #
 
-import os
-from django.conf import settings
-
-BASE_URL = getattr(settings, 'API_BASE_URL', os.getenv('API_BASE_URL', 'http://127.0.0.1:8000/api'))
+BASE_URL = 'http://165.227.21.22/api'
 
 # Autenticación:
 AUTH_ENDPOINTS = {
@@ -19,8 +16,7 @@ DATA_ENDPOINTS = {
 
 # Datos biométricos:
 BIOMETRICS_ENDPOINTS = {
-    # TODO: Cambiar esta URL (en espera de creación del Endpoint).
-    'TARNISHED': f'{BASE_URL}/biometrics/{{id}}',
+    'TARNISHED': f'{BASE_URL}/biometrics/bpm/',
 }
 
 # Oficiales (por supervisor):
@@ -29,6 +25,13 @@ OFFICERS_ENDPOINTS = {
     'CREATE': f'{BASE_URL}/users/',
     'TARNISHED': f'{BASE_URL}/users/{{id}}/',
     'ASSIGNMENTS': f'{BASE_URL}/supervisors/assignments/',
+}
+
+# Supervisores:
+SUPERVISORS_ENDPOINTS = {
+    'LIST': f'{BASE_URL}/users/supervisors/',
+    'CREATE': f'{BASE_URL}/users/',
+    'TARNISHED': f'{BASE_URL}/users/{{id}}/',
 }
 
 # Reportes:
@@ -42,7 +45,7 @@ REPORTS_ENDPOINTS = {
 
 # Alertas:
 ALERTS_ENDPOINTS = {
-    'LIST': f'{BASE_URL}/alerts/',
+    'LIST': f'{BASE_URL}/biometrics/alerts/',
 }
 
 # Analytics y ML:

@@ -60,18 +60,18 @@
             </div>
         </div>
 
-        <div class='detail-text'>
+        <div class='detail-text detail-long'>
             <strong>Resumen</strong>
-            <p>{{ report.summary|default:"Sin resumen" }}</p>
+            <p class='justifiEd-text'>{{ report.summary|default:"Sin resumen" }}</p>
         </div>
 
-        <div class='detail-text'>
+        <div class='detail-text detail-long'>
             <strong>Contenido</strong>
-            <p>{{ report.content }}</p>
+            <p class='justifiEd-text'>{{ report.content }}</p>
         </div>
 
         <div class='detail-date'>
-            <strong>Última actualización</strong>
+            <strong>Última actualización:</strong>
             <span>{{ report.updated_at|date:"d/m/Y H:i" }}</span>
         </div>
 

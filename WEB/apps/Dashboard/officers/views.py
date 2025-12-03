@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from apps.Dashboard.mixins import LoginRequiredMixin
-from apps.Dashboard.endpoints import OFFICERS_ENDPOINTS, BIOMETRICS_ENDPOINTS
+from apps.Dashboard.endpoints import OFFICERS_ENDPOINTS, BIOMETRICS_ENDPOINTS, REPORTS_ENDPOINTS
 
 # ---------------------------------------------------------------------------- #
 
@@ -67,32 +67,56 @@ def manage_officer(request, officer_id):
 LAST_BPM = 78
 LAST_STRESS = 35
 
-# Simulación de datos biométricos.
+# Datos biométricos.
 def biometric_api(request):
-    badge = request.GET.get('badge')
+    officerId = int(request.GET.get("officer", 0))
 
-    if badge == 'P-####':
-        try: # Si el oficial posee ese número de placa, no simula los datos.
-
-            API_URL = BIOMETRICS_ENDPOINTS['TARNISHED'].format(id=badge)
-            response = requests.get(API_URL)
+    if officerId == 2:
+        try: # Intenta obtener los datos de la API.
+            API_URL = BIOMETRICS_ENDPOINTS['TARNISHED']
+            response = requests.get(API_URL, timeout=5)
 
             if response.status_code == 200:
                 data = response.json()
 
-                return JsonResponse({
-                    "bpm": data.get("bpm", BASE_BPM),
-                    "stress": data.get("stress", BASE_STRESS)
-                })
+                if data.get('success'):
+                    if data.get('data'):
+                        latest_entry = data["data"][0]
+
+                        if latest_entry['user_id'] == officerId:
+                            bpm = round(latest_entry["value"])
+                            created_at = latest_entry["created_at"]
+                    else:
+                        bpm = 0
+                        created_at = None
+
+                    # Cálculo real de estrés basado en BPM
+                    stress = calculate_stress_from_bpm(bpm)
+                    print("bpm", bpm, "\nstress", stress, "\ncreated_at", created_at)
+
+                    return JsonResponse({
+                        "bpm": bpm,
+                        "stress": stress,
+                        "created_at": created_at
+                    })
 
         except requests.exceptions.RequestException:
             messages.error(request, 'No se ha podido conectar con el servidor.')
 
-    # Para los demás oficiales:
+    # Los demás oficiales poseen datos simulados.
     bpm, stress = biometric_data()
-
     return JsonResponse({ "bpm": bpm, "stress": stress })
 
+# Cálculo del estrés según BPM.
+def calculate_stress_from_bpm(bpm: int) -> int:
+    if bpm <= 0: return 0
+    min_bpm, max_bpm = 60, 140
+    normalized = (bpm - min_bpm) / (max_bpm - min_bpm)
+    stress = int(max(5, min(100, normalized * 100)))
+
+    return stress
+
+# Simulación de datos.
 def biometric_data():
     global LAST_BPM, LAST_STRESS
 
@@ -127,25 +151,39 @@ class OfficerDetailView(LoginRequiredMixin, generic.View):
     context = {}
 
     def get(self, request, pk, *args, **kwargs):
-        officer = manage_officer(request, pk)
+        officerId = pk # ID del oficial consultado.
+        API_REPORTS = REPORTS_ENDPOINTS['TARNISHED'].format(id=officerId)
 
-        if not officer:
+        officerData = manage_officer(request, officerId)
+        response = requests.get(API_REPORTS)
+
+        if not officerData:
             messages.error(request, 'No se ha podido obtener la información del oficial solicitado.')
             return redirect('dashboard:OfficersList')
 
+        # Reportes:
+        officerReports = []
+        if response.status_code == 200:
+            try:
+                data = response.json()
+                officerReports = data.get("data", [])
+            except ValueError:
+                messages.error(request, 'Ha ocurrido un error al procesar los reportes del oficial.')
 
-        officerStatus = officer.get('status')
+        # Etiqueta de estado:
+        officerStatus = officerData.get('status')
         if not officerStatus:
-            officer['status_label'] = 'Desconocido'
+            officerData['status_label'] = 'Desconocido'
         else:
-            officer['status_label'] = {
+            officerData['status_label'] = {
                 'Active': 'Activo',
                 'Inactive': 'Inactivo',
                 'Suspended': 'Suspendido',
                 'OnLeave': 'Fuera de servicio'
             }.get(officerStatus, officerStatus)
 
-        return render(request, self.template_name, {"officer": officer})
+        self.context = { "officer": officerData, "reports": officerReports }
+        return render(request, self.template_name, self.context)
 
 # ---------------------------------------------------------------------------- #
 
@@ -237,8 +275,6 @@ class OfficersCreateView(LoginRequiredMixin, generic.View):
             newOfficerData = responseCreateJSON.get('data', {}) 
             newOfficerID = newOfficerData.get('id')
 
-            print(newOfficerID)
-
             if newOfficerID: # Asignación al supervisor.
                 assignmentData = {
                     "supervisor": int(supervisorId),
@@ -307,8 +343,19 @@ class OfficersUpdateView(LoginRequiredMixin, generic.View):
             if responseUpdate.status_code in [200, 201]:
                 messages.success(request, 'La información del oficial ha sido actualizada correctamente.')
                 return redirect('dashboard:OfficersList')
-            else:
-                messages.error(request, 'Ha ocurrido un error al intentar actualizar la información.')
+            else: 
+                try: # Parsear el JSON pa' los errores.
+                    errors = responseUpdate.json()
+                except ValueError:
+                    errors = {}
+
+                if 'email' in errors:
+                    messages.error(request, 'La dirección de correo proporcionada pertenece a otro oficial')
+                elif 'badge_number' in errors:
+                    messages.error(request, 'El número de placa proporcionado pertenece a otro oficial')
+
+                if not errors: # Para errores no especificados.
+                    messages.error(request, 'Ha ocurrido un error al intentar actualizar la información.')
 
                 context = { 'titleSection': 'Actualizando oficial', 'officer': updateData }
                 return render(request, self.template_name, context)
